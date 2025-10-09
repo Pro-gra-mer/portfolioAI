@@ -1,6 +1,16 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useScrollAnimation } from '../../components/useScrollAnimation';
+
+interface Experience {
+  id: string;
+  position: string;
+  company: string;
+  period: string;
+  description: string;
+  isCurrent: boolean;
+}
 
 export default function About() {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
@@ -8,6 +18,28 @@ export default function About() {
   const { ref: skillsRef, isVisible: skillsVisible } = useScrollAnimation(0.1);
   const { ref: experienceRef, isVisible: experienceVisible } = useScrollAnimation(0.1);
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation(0.1);
+
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchExperiences();
+  }, []);
+
+  const fetchExperiences = async () => {
+    try {
+      const response = await fetch('/api/public/experience');
+      const data = await response.json();
+
+      if (response.ok) {
+        setExperiences(data.experiences || []);
+      }
+    } catch (error) {
+      console.error('Error obteniendo experiencia laboral:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -100,16 +132,19 @@ export default function About() {
               </h2>
               <div className="space-y-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
                 <p>
-                  Desde pequeña, la tecnología me fascinó. Lo que comenzó como curiosidad por entender cómo funcionan las cosas digitales,
-                  se convirtió en una pasión por crear experiencias web excepcionales.
+                  Desarrolladora web con una historia de transformación y pasión por la tecnología. En 2023, decidí dar un giro completo a mi vida laboral, para dejar atrás el sector de la limpieza y dedicarme al desarrollo web, un campo donde las horas vuelan y la creatividad no tiene límites.
                 </p>
                 <p>
-                  Mi viaje comenzó con el diseño gráfico y front-end, pero rápidamente evolucionó hacia el desarrollo fullstack.
-                  Hoy, me especializo en integrar inteligencia artificial en aplicaciones web modernas.
+                  Me formé en diferentes plataformas online como: PixelPro, Udemy, Pildorasinformáticas y Grupo Atrium, adquiriendo experiencia en lenguajes y frameworks modernos como JavaScript, Java, Angular y Spring Boot. Me encantan los desafíos de resolver problemas y construir aplicaciones atractivas y funcionales que marquen la diferencia.
                 </p>
                 <p>
-                  Creo que la tecnología debe ser hermosa y funcional. Cada proyecto es una oportunidad para resolver problemas
-                  reales con soluciones innovadoras y elegantes.
+                Gracias a la formación recibida y a mi esfuerzo constante, he logrado alcanzar mi objetivo de dedicarme profesionalmente al desarrollo web. Este proyecto representa un paso clave en mi trayectoria, al permitirme consolidar mis conocimientos y aplicarlos en un entorno real, uniendo diseño, funcionalidad y experiencia de usuario.
+                </p>
+                <p>
+                  Mi transición profesional me ha enseñado que la dedicación y el aprendizaje continuo son clave para el éxito. Mi experiencia previa me dio habilidades como la adaptabilidad y la atención al detalle, valores que ahora aplico al desarrollo web.
+                </p>
+                <p>
+                  Fuera del código, disfruto de la lectura, el deporte y la videografía, actividades que me inspiran a seguir creciendo tanto personal como profesionalmente.
                 </p>
               </div>
             </div>
@@ -125,9 +160,7 @@ export default function About() {
                 </div>
                 <h3 className="text-2xl font-semibold mb-4">Filosofía de desarrollo</h3>
                 <p className="text-blue-100 leading-relaxed">
-                  "La verdadera innovación ocurre en la intersección entre la creatividad humana
-                  y el poder de la inteligencia artificial. Cada línea de código es una oportunidad
-                  para crear algo extraordinario."
+                “El futuro del desarrollo está en la unión entre la creatividad humana y la inteligencia artificial. Aprovechar su potencial nos permite construir soluciones más inteligentes, eficientes y con un impacto real.”
                 </p>
               </div>
             </div>
@@ -168,8 +201,8 @@ export default function About() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Frontend</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• React & Next.js</li>
-                  <li>• TypeScript</li>
+                  <li>• Angular</li>
+                  <li>• JavaScript</li>
                   <li>• Tailwind CSS</li>
                   <li>• Responsive Design</li>
                 </ul>
@@ -186,11 +219,11 @@ export default function About() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Backend</h3>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• Node.js & Express</li>
-                  <li>• Python & Django</li>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">                  
+                  <li>• Spring Boot</li>
+                  <li>• Java </li>
                   <li>• REST APIs</li>
-                  <li>• GraphQL</li>
+                  <li>• Laravel</li>                  
                 </ul>
               </div>
             </div>
@@ -207,8 +240,8 @@ export default function About() {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">IA/ML</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <li>• OpenAI & GPT</li>
-                  <li>• TensorFlow.js</li>
-                  <li>• NLP & Computer Vision</li>
+                  <li>• Windsurf Editor</li>
+                  <li>• N8N</li>
                   <li>• Chatbots Inteligentes</li>
                 </ul>
               </div>
@@ -225,9 +258,8 @@ export default function About() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Bases de Datos</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• PostgreSQL</li>
-                  <li>• MongoDB</li>
-                  <li>• Redis</li>
+                  <li>• MySQL</li>
+                  <li>• MongoDB</li>              
                   <li>• Prisma ORM</li>
                 </ul>
               </div>
@@ -258,71 +290,58 @@ export default function About() {
           <div className={`relative transition-all duration-1000 delay-500 ${
             experienceVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
+          <div className={`relative transition-all duration-1000 delay-500 ${
+            experienceVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
             <div className="space-y-12">
-              {/* Experience Item */}
-              <div className="relative flex items-start space-x-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-2"></div>
-                <div className="flex-1 pb-12">
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                      <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                        Senior Full Stack Developer
-                      </h3>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 mt-2 md:mt-0">
-                        2022 - Presente
-                      </span>
-                    </div>
-                    <p className="text-lg text-blue-600 dark:text-blue-400 mb-4">TechCorp Solutions</p>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Liderazgo en el desarrollo de aplicaciones web modernas con integración de IA.
-                      Arquitectura de sistemas escalables y mentoría de desarrolladores junior.
-                    </p>
-                  </div>
+              {loading ? (
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mx-auto"></div>
                 </div>
-              </div>
-
-              <div className="relative flex items-start space-x-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mt-2"></div>
-                <div className="flex-1 pb-12">
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                      <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                        AI Integration Specialist
-                      </h3>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 mt-2 md:mt-0">
-                        2020 - 2022
-                      </span>
-                    </div>
-                    <p className="text-lg text-purple-600 dark:text-purple-400 mb-4">Innovation Labs</p>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Especialización en integración de modelos de machine learning en plataformas web.
-                      Desarrollo de chatbots inteligentes y sistemas de recomendación.
-                    </p>
-                  </div>
+              ) : experiences.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    La experiencia profesional se mostrará aquí una vez que se añada desde el dashboard.
+                  </p>
                 </div>
-              </div>
-
-              <div className="relative flex items-start space-x-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mt-2"></div>
-                <div className="flex-1">
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                      <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                        Frontend Developer
-                      </h3>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 mt-2 md:mt-0">
-                        2019 - 2020
-                      </span>
+              ) : (
+                experiences.map((experience, index) => (
+                  <div key={experience.id} className="relative flex items-start space-x-8">
+                    <div className={`flex-shrink-0 w-4 h-4 rounded-full mt-2 ${
+                      experience.isCurrent
+                        ? 'bg-gradient-to-r from-green-500 to-green-600'
+                        : index % 2 === 0
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500'
+                          : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                    }`}></div>
+                    <div className="flex-1 pb-12">
+                      <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                            {experience.position}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-2 md:mt-0">
+                            {experience.isCurrent && (
+                              <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full text-xs font-medium">
+                                Trabajo actual
+                              </span>
+                            )}
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {experience.period}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-lg text-blue-600 dark:text-blue-400 mb-4">{experience.company}</p>
+                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                          {experience.description}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-lg text-pink-600 dark:text-pink-400 mb-4">Digital Studio</p>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Desarrollo de interfaces de usuario modernas y responsivas.
-                      Colaboración en proyectos de e-commerce y aplicaciones web corporativas.
-                    </p>
                   </div>
-                </div>
-              </div>
+                ))
+              )}
             </div>
+          </div>
           </div>
         </div>
       </section>
