@@ -16,15 +16,15 @@ export type UIProject = {
   metrics: Record<string, string>;
 };
 
-export default function ProjectsClient({ projects }: { projects: UIProject[] }) {
+export default function ProjectsClient({ projects, featuredProject }: { projects: UIProject[], featuredProject?: UIProject }) {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
   const { ref: projectsRef, isVisible: projectsVisible } = useScrollAnimation(0.1);
   const { ref: featuredRef, isVisible: featuredVisible } = useScrollAnimation(0.1);
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation(0.1);
 
   const hasProjects = projects.length > 0;
-  const featured = hasProjects ? projects[0] : null;
-  const rest = hasProjects ? projects.slice(1) : [];
+  const featured = featuredProject || (hasProjects ? projects[0] : null);
+  const rest = hasProjects ? projects.filter(p => p.id !== featured?.id) : [];
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">

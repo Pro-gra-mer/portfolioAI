@@ -10,7 +10,15 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ projects });
+    // Buscar proyecto destacado
+    const featuredProject = await prisma.project.findFirst({
+      where: { isFeatured: true },
+    });
+
+    return NextResponse.json({
+      projects,
+      featuredProject: featuredProject || projects[0] // Si no hay destacado, usar el primero
+    });
   } catch (error) {
     console.error('Error obteniendo proyectos públicos:', error);
     return NextResponse.json(

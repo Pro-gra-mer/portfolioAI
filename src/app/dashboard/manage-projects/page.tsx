@@ -49,6 +49,33 @@ export default function ManageProjects() {
     }
   };
 
+  const toggleFeatured = async (projectId: string, isCurrentlyFeatured: boolean) => {
+    try {
+      const response = await fetch('/api/projects', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectId,
+          isFeatured: !isCurrentlyFeatured,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error actualizando proyecto destacado');
+      }
+
+      // Actualizar la lista de proyectos
+      setProjects(projects.map(p =>
+        p.id === projectId
+          ? { ...p, isFeatured: !isCurrentlyFeatured }
+          : { ...p, isFeatured: false } // Solo un proyecto puede estar destacado
+      ));
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
   const deleteProject = async (projectId: string) => {
     if (!confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
       return;
@@ -67,9 +94,11 @@ export default function ManageProjects() {
       setProjects(projects.filter(p => p.id !== projectId));
     } catch (error: any) {
       setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
-
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
@@ -207,8 +236,24 @@ export default function ManageProjects() {
                       ))}
                     </div>
 
+                    {/* Featured Badge */}
+                    {project.isFeatured && (
+                      <div className="mb-4">
+                        <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full text-xs font-medium">
+                          ⭐ Proyecto destacado
+                        </span>
+                      </div>
+                    )}
+
                     {/* Actions */}
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => toggleFeatured(project.id, project.isFeatured || false)}
+                        className={`flex-1 ${project.isFeatured ? 'bg-gray-500 hover:bg-gray-600' : 'bg-yellow-500 hover:bg-yellow-600'} text-white py-2 px-3 rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105`}
+                      >
+                        {project.isFeatured ? 'Quitar destacado' : 'Marcar destacado'}
+                      </button>
                       <button
                         type="button"
                         onClick={() => goToEdit(project.id)}

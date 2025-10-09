@@ -14,8 +14,8 @@ export default function FeaturedProjectSection() {
         const res = await fetch('/api/public/projects', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (data.projects && data.projects.length > 0) {
-            const p = data.projects[0];
+          if (data.featuredProject) {
+            const p = data.featuredProject;
             const parse = (v: any, fb: any) => {
               if (v == null) return fb;
               if (typeof v === 'string') {

@@ -100,6 +100,7 @@ export async function PUT(
       bgColor,
       features,
       metrics,
+      isFeatured,
     } = body;
 
     const updatedProject = await prisma.project.update({
@@ -117,6 +118,7 @@ export async function PUT(
         ...(bgColor && { bgColor }),
         ...(features && { features: JSON.stringify(features) }),
         ...(metrics && { metrics: JSON.stringify(metrics) }),
+        ...(isFeatured !== undefined && { isFeatured }),
       },
     });
 

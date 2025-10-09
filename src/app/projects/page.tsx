@@ -8,6 +8,7 @@ export default function Projects() {
   const { ref: projectsRef, isVisible: projectsVisible } = useScrollAnimation(0.1);
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation(0.1);
   const [projects, setProjects] = useState<any[]>([]);
+  const [featuredProject, setFeaturedProject] = useState<any>(null);
 
   useEffect(() => {
     async function load() {
@@ -34,6 +35,27 @@ export default function Projects() {
           };
         });
         setProjects(list);
+
+        // Establecer proyecto destacado
+        if (data.featuredProject) {
+          const featured = data.featuredProject;
+          const parse = (v: any, fb: any) => {
+            if (v == null) return fb;
+            if (typeof v === 'string') {
+              try { return JSON.parse(v); } catch { return fb; }
+            }
+            return v;
+          };
+          setFeaturedProject({
+            ...featured,
+            technologies: parse(featured.technologies, []),
+            features: parse(featured.features, []),
+            metrics: parse(featured.metrics, {}),
+            longDescription: featured.longDescription || featured.description,
+            bgColor: featured.bgColor || `bg-gradient-to-br ${featured.gradient}`,
+            textColor: featured.textColor || 'text-white',
+          });
+        }
       } catch (e) {
         console.error(e);
       }
