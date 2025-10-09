@@ -1,0 +1,527 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+
+// Form shape aligned with creation page and API contract
+type Metrics = {
+  users: string;
+  accuracy: string;
+  satisfaction: string;
+};
+
+type FormData = {
+  title: string;
+  category: string;
+  description: string;
+  longDescription: string;
+  technologies: string[];
+  gradient: string;
+  textColor: string;
+  bgColor: string;
+  features: string[];
+  metrics: Metrics;
+};
+
+export default function EditProjectPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const params = useParams() as { id?: string };
+  const projectId = params?.id || "";
+
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    category: "",
+    description: "",
+    longDescription: "",
+    technologies: [""],
+    gradient: "from-blue-500 to-purple-600",
+    textColor: "text-white",
+    bgColor: "bg-gradient-to-br from-blue-500 to-purple-600",
+    features: [""],
+    metrics: {
+      users: "",
+      accuracy: "",
+      satisfaction: "",
+    },
+  });
+
+  const gradientOptions = [
+    { value: "from-blue-500 to-purple-600", label: "Azul a Púrpura" },
+    { value: "from-purple-500 to-pink-600", label: "Púrpura a Rosa" },
+    { value: "from-green-500 to-teal-600", label: "Verde a Verde Azulado" },
+    { value: "from-orange-500 to-red-600", label: "Naranja a Rojo" },
+    { value: "from-indigo-500 to-blue-600", label: "Índigo a Azul" },
+    { value: "from-pink-500 to-purple-600", label: "Rosa a Púrpura" },
+  ];
+
+  const categoryOptions = [
+    "Inteligencia Artificial",
+    "E-commerce & Machine Learning",
+    "Business Intelligence & AI",
+    "Realidad Aumentada & Computer Vision",
+    "Web Development",
+    "Mobile Development",
+    "Data Science",
+    "DevOps & Cloud",
+    "Cybersecurity",
+    "Blockchain",
+    "IoT & Embedded Systems",
+    "Otro",
+  ];
+
+  useEffect(() => {
+    const loadProject = async () => {
+      if (!projectId) return;
+      try {
+        setError("");
+        // Reutilizamos GET /api/projects (lista del usuario) y filtramos por id
+        const res = await fetch("/api/projects", { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("No se pudieron obtener los proyectos");
+        }
+        const data = await res.json();
+        const project = (data?.projects || []).find((p: any) => p.id === projectId);
+        if (!project) {
+          throw new Error("Proyecto no encontrado");
+        }
+
+        const parseMaybeJson = (val: any, fallback: any) => {
+          if (val == null) return fallback;
+          if (typeof val === "string") {
+            try { return JSON.parse(val); } catch { return fallback; }
+          }
+          return val; // ya es JSON
+        };
+
+        const technologies = parseMaybeJson(project.technologies, []);
+        const features = parseMaybeJson(project.features, []);
+        const metrics = parseMaybeJson(project.metrics, { users: "", accuracy: "", satisfaction: "" });
+
+        setFormData({
+          title: project.title || "",
+          category: project.category || "",
+          description: project.description || "",
+          longDescription: project.longDescription || project.description || "",
+          technologies: Array.isArray(technologies) && technologies.length > 0 ? technologies : [""],
+          gradient: project.gradient || "from-blue-500 to-purple-600",
+          textColor: project.textColor || "text-white",
+          bgColor: project.bgColor || `bg-gradient-to-br ${project.gradient || "from-blue-500 to-purple-600"}`,
+          features: Array.isArray(features) && features.length > 0 ? features : [""],
+          metrics: {
+            users: metrics?.users || "",
+            accuracy: metrics?.accuracy || "",
+            satisfaction: metrics?.satisfaction || "",
+          },
+        });
+      } catch (e: any) {
+        setError(e.message || "Error cargando el proyecto");
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    if (status === "authenticated") {
+      loadProject();
+    } else if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, projectId, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}` , {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || "Error actualizando proyecto");
+      }
+
+      router.push("/dashboard");
+    } catch (e: any) {
+      setError(e.message || "Error actualizando proyecto");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addTechnology = () => {
+    setFormData(prev => ({ ...prev, technologies: [...prev.technologies, ""] }));
+  };
+  const updateTechnology = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      technologies: prev.technologies.map((t, i) => (i === index ? value : t)),
+    }));
+  };
+  const removeTechnology = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      technologies: prev.technologies.filter((_, i) => i !== index),
+    }));
+  };
+
+  const addFeature = () => {
+    setFormData(prev => ({ ...prev, features: [...prev.features, ""] }));
+  };
+  const updateFeature = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.map((f, i) => (i === index ? value : f)),
+    }));
+  };
+  const removeFeature = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateMetrics = (field: keyof Metrics, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      metrics: { ...prev.metrics, [field]: value },
+    }));
+  };
+
+  if (status === "loading" || initialLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-black">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10">
+        {/* Header */}
+        <header className="bg-white dark:bg-gray-800 shadow-lg">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  ← Volver al dashboard
+                </Link>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Editar Proyecto</h1>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">Actualiza los detalles de tu proyecto</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Información Básica */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Información Básica</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Título del Proyecto *</label>
+                    <input
+                      type="text"
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Ej: Asistente Virtual IA"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría *</label>
+                    <select
+                      id="category"
+                      value={formData.category}
+                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      required
+                    >
+                      <option value="">Seleccionar categoría</option>
+                      {categoryOptions.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción Corta *</label>
+                  <textarea
+                    id="description"
+                    rows={3}
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    placeholder="Breve descripción del proyecto..."
+                    required
+                  />
+                </div>
+
+                <div className="mt-6">
+                  <label htmlFor="longDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción Detallada</label>
+                  <textarea
+                    id="longDescription"
+                    rows={4}
+                    value={formData.longDescription}
+                    onChange={(e) => setFormData(prev => ({ ...prev, longDescription: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    placeholder="Descripción más detallada del proyecto, características principales, etc."
+                  />
+                </div>
+              </div>
+
+              {/* Tecnologías */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tecnologías Utilizadas</h3>
+
+                <div className="space-y-4">
+                  {formData.technologies.map((tech, index) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <input
+                        type="text"
+                        value={tech}
+                        onChange={(e) => updateTechnology(index, e.target.value)}
+                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        placeholder={`Tecnología ${index + 1}`}
+                      />
+                      {formData.technologies.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeTechnology(index)}
+                          className="p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          aria-label="Eliminar tecnología"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addTechnology}
+                    className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Agregar tecnología</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Apariencia */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Apariencia Visual</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="gradient" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Esquema de Colores *</label>
+                    <select
+                      id="gradient"
+                      value={formData.gradient}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        gradient: e.target.value,
+                        bgColor: `bg-gradient-to-br ${e.target.value}`,
+                      }))}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      required
+                    >
+                      {gradientOptions.map((option) => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="textColor" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color del Texto</label>
+                    <select
+                      id="textColor"
+                      value={formData.textColor}
+                      onChange={(e) => setFormData(prev => ({ ...prev, textColor: e.target.value }))}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    >
+                      <option value="text-white">Blanco</option>
+                      <option value="text-black">Negro</option>
+                      <option value="text-gray-900">Gris Oscuro</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vista Previa</label>
+                  <div className={`w-full h-20 ${formData.bgColor} rounded-xl flex items-center justify-center`}>
+                    <span className={`${formData.textColor} font-semibold`}>
+                      {formData.title || "Título del Proyecto"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Características */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Características Principales</h3>
+
+                <div className="space-y-4">
+                  {formData.features.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={(e) => updateFeature(index, e.target.value)}
+                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        placeholder={`Característica ${index + 1}`}
+                      />
+                      {formData.features.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeFeature(index)}
+                          className="p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          aria-label="Eliminar característica"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addFeature}
+                    className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Agregar característica</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Métricas */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                  Métricas del Proyecto
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label htmlFor="users" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Usuarios / Alcance
+                    </label>
+                    <input
+                      type="text"
+                      id="users"
+                      value={formData.metrics.users}
+                      onChange={(e) => updateMetrics('users', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Ej: 10,000+"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="accuracy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Métrica Principal
+                    </label>
+                    <input
+                      type="text"
+                      id="accuracy"
+                      value={formData.metrics.accuracy}
+                      onChange={(e) => updateMetrics('accuracy', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Ej: 94%"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="satisfaction" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Métrica Secundaria
+                    </label>
+                    <input
+                      type="text"
+                      id="satisfaction"
+                      value={formData.metrics.satisfaction}
+                      onChange={(e) => updateMetrics('satisfaction', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Ej: 4.8/5"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Mensaje de error */}
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                  <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Botones */}
+              <div className="flex items-center space-x-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl disabled:scale-100 disabled:shadow-lg"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Guardando cambios...
+                    </span>
+                  ) : (
+                    "Guardar Cambios"
+                  )}
+                </button>
+
+                <Link
+                  href="/dashboard"
+                  className="px-6 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
+                >
+                  Cancelar
+                </Link>
+              </div>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
