@@ -121,12 +121,28 @@ export default function FeaturedProjectSection() {
                 {Object.entries(featuredProject.metrics || {})
                   .filter(([k]) => !['users','accuracy','satisfaction','conversion','engagement','revenue','retention'].includes(k))
                   .slice(0,3)
-                  .map(([model, percent]) => (
-                    <div key={model} className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{String(percent)}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">{model}</div>
-                    </div>
-                  ))}
+                  .map(([model, percent], index) => {
+                    // Función para asignar colores diferentes a cada modelo de IA
+                    const getModelColor = (index: number) => {
+                      const colors = [
+                        'text-blue-600 dark:text-blue-400',   // Azul para el primero
+                        'text-green-600 dark:text-green-400', // Verde para el segundo
+                        'text-purple-600 dark:text-purple-400' // Púrpura para el tercero
+                      ];
+                      return colors[index % colors.length];
+                    };
+
+                    return (
+                      <div key={model} className="text-center">
+                        <div className={`text-3xl font-bold ${getModelColor(index)}`}>
+                          {String(percent)}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {model}
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
 
               {/* Tecnologías utilizadas */}

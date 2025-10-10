@@ -69,6 +69,8 @@ model Project {
   textColor       String
   bgColor         String
   videoUrl        String?  // URL opcional de YouTube/Vimeo para embeber
+  imageUrl        String?  // URL de imagen en Cloudinary
+  imagePublicId   String?  // Public ID en Cloudinary para gestionar borrados
   features        Json     // Array de strings
   metrics         Json     // Objeto con métricas
   isFeatured      Boolean  @default(false)

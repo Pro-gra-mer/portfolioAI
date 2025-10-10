@@ -165,28 +165,39 @@ export default function Projects() {
                 className={`group relative bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-800 hover:scale-105`}
                 style={{ animationDelay: `${index * 200}ms` }}
               >
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className={`w-16 h-16 ${project.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
-                      <span className="text-white text-sm font-medium">Demo</span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{project.title}</h3>
+                {project.imageUrl ? (
+                  <div className="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
                   </div>
-                </div>
+                ) : (
+                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className={`w-16 h-16 ${project.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                        <span className="text-white text-sm font-medium">Demo</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{project.title}</h3>
+                    </div>
+                  </div>
+                )}
 
-                <div className="p-8">
-                  <span className={`inline-block px-3 py-1 ${project.bgColor} text-white rounded-full text-sm font-medium mb-4`}>
+                <div className="p-10">
+                  <span className={`inline-block px-3 py-1 ${project.bgColor} text-white rounded-full text-sm font-medium mb-6`}>
                     {project.category}
                   </span>
 
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                     {project.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed line-clamp-3">
                     {project.description}
                   </p>
 
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-3 gap-4 mb-8">
                     {Object.entries(project.metrics || {})
                       .filter(([k]) => !['users','accuracy','satisfaction','conversion','engagement','revenue','retention'].includes(k))
                       .slice(0, 3)
@@ -198,7 +209,7 @@ export default function Projects() {
                     ))}
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-wrap gap-2 mb-8">
                     {project.technologies.slice(0, 4).map((tech: string, techIndex: number) => (
                       <span
                         key={techIndex}

@@ -21,6 +21,8 @@ type FormData = {
   textColor: string;
   bgColor: string;
   videoUrl: string;
+  imageUrl: string;
+  imagePublicId: string;
   features: string[];
   metrics: ModelUsage[];
 };
@@ -45,11 +47,33 @@ export default function EditProjectPage() {
     textColor: "text-white",
     bgColor: "bg-gradient-to-br from-blue-500 to-purple-600",
     videoUrl: "",
+    imageUrl: "",
+    imagePublicId: "",
     features: [""],
     metrics: [
       { model: "", percent: "" },
     ],
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleProjectImageSelect = async (file: File | null) => {
+    if (!file) return;
+    try {
+      setUploadingImage(true);
+      const fd = new FormData();
+      fd.set('file', file);
+      fd.set('type', 'projectImage');
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error subiendo imagen');
+      setFormData(prev => ({ ...prev, imageUrl: data.url || '', imagePublicId: data.publicId || '' }));
+    } catch (e: any) {
+      setError(e?.message || 'Error subiendo imagen');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const gradientOptions = [
     { value: "from-blue-500 to-purple-600", label: "Azul a Púrpura" },
@@ -58,6 +82,7 @@ export default function EditProjectPage() {
     { value: "from-orange-500 to-red-600", label: "Naranja a Rojo" },
     { value: "from-indigo-500 to-blue-600", label: "Índigo a Azul" },
     { value: "from-pink-500 to-purple-600", label: "Rosa a Púrpura" },
+    { value: "from-amber-500 to-orange-600", label: "Ámbar a Naranja" },
   ];
 
   const categoryOptions = [
@@ -118,6 +143,8 @@ export default function EditProjectPage() {
           textColor: project.textColor || "text-white",
           bgColor: project.bgColor || `bg-gradient-to-br ${project.gradient || "from-blue-500 to-purple-600"}`,
           videoUrl: project.videoUrl || "",
+          imageUrl: (project as any).imageUrl || "",
+          imagePublicId: (project as any).imagePublicId || "",
           features: Array.isArray(features) && features.length > 0 ? features : [""],
           metrics: modelUsage.length > 0 ? modelUsage : [{ model: "", percent: "" }],
         });
@@ -339,6 +366,28 @@ export default function EditProjectPage() {
                     placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
                   />
                   <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Pega un enlace de YouTube o Vimeo. Lo mostraremos embebido en la ficha del proyecto.</p>
+                </div>
+
+                {/* Imagen del proyecto (Cloudinary) */}
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imagen del proyecto (Cloudinary)</label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleProjectImageSelect(e.target.files?.[0] || null)}
+                      className="block w-full text-sm text-gray-900 dark:text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 hover:file:text-gray-900 dark:file:bg-gray-800 dark:file:text-gray-200"
+                    />
+                    {uploadingImage && (
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Subiendo...</span>
+                    )}
+                  </div>
+                  {formData.imageUrl && (
+                    <div className="mt-4">
+                      <img src={formData.imageUrl} alt="Previsualización" className="w-full max-w-md rounded-xl border border-gray-200 dark:border-gray-700" />
+                    </div>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Se subirá a tu cuenta de Cloudinary definida en <code>.env</code> con <code>CLOUDINARY_URL</code>.</p>
                 </div>
               </div>
 

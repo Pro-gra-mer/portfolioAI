@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { promises as fs } from 'fs';
 import path from 'path';
+// @ts-ignore - types provided by package or ignored at build
+import { v2 as cloudinary } from 'cloudinary';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { authOptions } from '../auth/[...nextauth]/route.js';
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!type || !['profileImage', 'heroImage'].includes(type)) {
+    if (!type || !['profileImage', 'heroImage', 'projectImage'].includes(type)) {
       return NextResponse.json(
         { error: 'Tipo de imagen inválido' },
         { status: 400 }
@@ -53,43 +55,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear directorio de uploads si no existe
+    // Convertir archivo a buffer y guardar
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Si es imagen de proyecto, subir a Cloudinary
+    if (type === 'projectImage') {
+      // Cloudinary lee CLOUDINARY_URL del entorno automáticamente
+      const uploadResult = await new Promise<{ url: string; public_id: string }>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: `portfolio/projects/${userId}`,
+            resource_type: 'image',
+          },
+          (error: any, result: any) => {
+            if (error || !result) return reject(error);
+            resolve({ url: result.secure_url as string, public_id: result.public_id as string });
+          }
+        );
+        stream.end(buffer);
+      });
+
+      return NextResponse.json({
+        message: 'Imagen subida a Cloudinary correctamente',
+        url: uploadResult.url,
+        publicId: uploadResult.public_id,
+        size: file.size,
+        type: file.type,
+      });
+    }
+
+    // Para otros tipos, mantener almacenamiento local actual
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    try {
-      await fs.access(uploadsDir);
-    } catch {
-      await fs.mkdir(uploadsDir, { recursive: true });
-    }
-
-    // Crear subdirectorio por usuario
+    try { await fs.access(uploadsDir); } catch { await fs.mkdir(uploadsDir, { recursive: true }); }
     const userDir = path.join(uploadsDir, userId);
-    try {
-      await fs.access(userDir);
-    } catch {
-      await fs.mkdir(userDir, { recursive: true });
-    }
-
-    // Generar nombre único para el archivo
+    try { await fs.access(userDir); } catch { await fs.mkdir(userDir, { recursive: true }); }
     const timestamp = Date.now();
     const extension = path.extname(file.name) || '.jpg';
     const filename = `${type}_${timestamp}${extension}`;
     const filepath = path.join(userDir, filename);
-
-    // Convertir archivo a buffer y guardar
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
     await fs.writeFile(filepath, buffer);
 
-    // Devolver URL pública del archivo
     const publicUrl = `/uploads/${userId}/${filename}`;
-
-    return NextResponse.json({
-      message: 'Imagen subida correctamente',
-      url: publicUrl,
-      filename,
-      size: file.size,
-      type: file.type,
-    });
+    return NextResponse.json({ message: 'Imagen subida correctamente', url: publicUrl, filename, size: file.size, type: file.type });
 
   } catch (error) {
     console.error('Error subiendo imagen:', error);

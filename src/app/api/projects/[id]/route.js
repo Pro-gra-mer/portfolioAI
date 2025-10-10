@@ -101,6 +101,8 @@ export async function PUT(
       features,
       metrics,
       isFeatured,
+      imageUrl,
+      imagePublicId,
       videoUrl,
     } = body;
 
@@ -120,6 +122,8 @@ export async function PUT(
         ...(features && { features: JSON.stringify(features) }),
         ...(metrics && { metrics: JSON.stringify(metrics) }),
         ...(isFeatured !== undefined && { isFeatured }),
+        ...(imageUrl !== undefined && { imageUrl }),
+        ...(imagePublicId !== undefined && { imagePublicId }),
         ...(videoUrl !== undefined && { videoUrl }),
       },
     });

@@ -35,24 +35,37 @@ export default async function ProjectDetail({ params }: { params: { id: string }
   const gradient = project.bgColor || `bg-gradient-to-br ${project.gradient}`;
   const textColor = project.textColor || "text-white";
   const videoUrl = (project as any).videoUrl as string | undefined;
+  const imageUrl = (project as any).imageUrl as string | undefined;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Hero / Cover */}
-      <section className={`${gradient} text-white`}>
-        <div className="container mx-auto px-6 py-20">
-          <div className="max-w-5xl">
-            <div className="mb-4">
-              <Link href="/projects" className="inline-flex items-center text-white/90 hover:text-white transition">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+      <section className={`${gradient} text-white relative`}>
+        <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-20">
+          <div className="max-w-4xl lg:max-w-5xl">
+            <div className="mb-3 sm:mb-4">
+              <Link href="/projects" className="inline-flex items-center text-white/90 hover:text-white transition text-sm sm:text-base">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                 Volver a proyectos
               </Link>
             </div>
-            <span className="inline-block px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-4">{project.category}</span>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight">{project.title}</h1>
-            <p className="mt-6 text-lg text-white/90 max-w-3xl">{project.description}</p>
+            <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-white/20 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">{project.category}</span>
+            <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">{project.title}</h1>
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/90 max-w-2xl sm:max-w-3xl">{project.description}</p>
           </div>
         </div>
+
+        {/* Project Image - responsive size, better positioned */}
+        {imageUrl && (
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-32 h-20 sm:w-40 sm:h-28 rounded-md sm:rounded-lg overflow-hidden shadow-md sm:shadow-lg border border-white/20 bg-white/10 backdrop-blur-sm">
+            <img
+              src={imageUrl}
+              alt={`Imagen de ${project.title}`}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              loading="eager"
+            />
+          </div>
+        )}
       </section>
 
       {/* Content */}
@@ -61,7 +74,7 @@ export default async function ProjectDetail({ params }: { params: { id: string }
           <article className="lg:col-span-2">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Descripción</h2>
             <div className="prose dark:prose-invert max-w-none">
-              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{project.longDescription || project.description}</p>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-6">{project.longDescription || project.description}</p>
             </div>
 
             {/* Video embed (YouTube/Vimeo) */}
@@ -101,14 +114,30 @@ export default async function ProjectDetail({ params }: { params: { id: string }
 
             {Object.keys(metrics).length > 0 && (
               <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow border border-gray-100 dark:border-gray-800">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Métricas</h4>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Modelos</h4>
                 <div className="grid grid-cols-3 gap-4">
-                  {Object.entries(metrics).map(([k, v]) => (
-                    <div key={k} className="text-center">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{String(v)}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">{k}</div>
-                    </div>
-                  ))}
+                  {Object.entries(metrics).map(([k, v], index) => {
+                    // Función para asignar colores diferentes a cada métrica
+                    const getMetricColor = (index: number) => {
+                      const colors = [
+                        'text-blue-600 dark:text-blue-400',   // Azul para el primero
+                        'text-green-600 dark:text-green-400', // Verde para el segundo
+                        'text-purple-600 dark:text-purple-400' // Púrpura para el tercero
+                      ];
+                      return colors[index % colors.length];
+                    };
+
+                    return (
+                      <div key={k} className="text-center">
+                        <div className={`text-2xl font-bold ${getMetricColor(index)}`}>
+                          {String(v)}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                          {k}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

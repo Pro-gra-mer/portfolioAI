@@ -41,21 +41,21 @@ export default function Header() {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/dashboard"
-                  className="relative text-gray-700 dark:text-gray-300 hover:text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 font-medium transition-all duration-300 hover:scale-105 flex items-center"
+                  className="relative group text-gray-700 dark:text-gray-300 font-medium transition-all duration-300 hover:scale-105 flex items-center"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  Dashboard
+                  <span className="group-hover:text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">Dashboard</span>
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="relative text-gray-700 dark:text-gray-300 hover:text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 font-medium transition-all duration-300 hover:scale-105 flex items-center"
+                  className="relative group text-gray-700 dark:text-gray-300 font-medium transition-all duration-300 hover:scale-105 flex items-center"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                  Salir
+                  <span className="group-hover:text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">Salir</span>
                 </button>
               </div>
             ) : (

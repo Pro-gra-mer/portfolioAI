@@ -188,17 +188,28 @@ export default function ManageProjects() {
                   className="bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-2xl transition-all duration-500 hover:scale-105"
                 >
                   {/* Project Preview */}
-                  <div className={`aspect-video ${project.bgColor} flex items-center justify-center`}>
-                    <div className="text-center text-white">
-                      <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-semibold">{project.title}</h3>
-                      <p className="text-sm opacity-90 mt-2">{project.category}</p>
+                  {project.imageUrl ? (
+                    <div className="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
+                      <img
+                        src={project.imageUrl as unknown as string}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
                     </div>
-                  </div>
+                  ) : (
+                    <div className={`aspect-video ${project.bgColor} flex items-center justify-center`}>
+                      <div className="text-center text-white">
+                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-semibold">{project.title}</h3>
+                        <p className="text-sm opacity-90 mt-2">{project.category}</p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Project Info */}
                   <div className="p-6">
@@ -224,16 +235,28 @@ export default function ManageProjects() {
 
                     {/* Metrics */}
                     <div className="grid grid-cols-3 gap-4 mb-6">
-                      {Object.entries(JSON.parse(project.metrics || '{}')).slice(0, 3).map(([key, value]) => (
-                        <div key={key} className="text-center">
-                          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                            {String(value)}
+                      {Object.entries(JSON.parse(project.metrics || '{}')).slice(0, 3).map(([key, value], index) => {
+                        // Función para asignar colores diferentes a cada métrica
+                        const getMetricColor = (index: number) => {
+                          const colors = [
+                            'text-blue-600 dark:text-blue-400',   // Azul para el primero
+                            'text-green-600 dark:text-green-400', // Verde para el segundo
+                            'text-purple-600 dark:text-purple-400' // Púrpura para el tercero
+                          ];
+                          return colors[index % colors.length];
+                        };
+
+                        return (
+                          <div key={key} className="text-center">
+                            <div className={`text-lg font-bold ${getMetricColor(index)}`}>
+                              {String(value)}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                              {key}
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                            {key}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {/* Featured Badge */}
@@ -252,7 +275,7 @@ export default function ManageProjects() {
                         onClick={() => toggleFeatured(project.id, project.isFeatured || false)}
                         className={`flex-1 ${project.isFeatured ? 'bg-gray-500 hover:bg-gray-600' : 'bg-yellow-500 hover:bg-yellow-600'} text-white py-2 px-3 rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105`}
                       >
-                        {project.isFeatured ? 'Quitar destacado' : 'Marcar destacado'}
+                        Destacar
                       </button>
                       <button
                         type="button"

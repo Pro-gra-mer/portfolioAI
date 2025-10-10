@@ -147,6 +147,8 @@ export async function POST(request: NextRequest) {
       textColor,
       bgColor,
       videoUrl,
+      imageUrl,
+      imagePublicId,
       features,
       metrics,
     } = body;
@@ -171,6 +173,8 @@ export async function POST(request: NextRequest) {
         textColor: textColor || 'text-white',
         bgColor,
         videoUrl: videoUrl || null,
+        imageUrl: imageUrl || null,
+        imagePublicId: imagePublicId || null,
         features: JSON.stringify(features || []),
         metrics: JSON.stringify(metrics || {}),
         userId: userId,
