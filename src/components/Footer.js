@@ -38,11 +38,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contacto</h4>
-            <ul className="space-y-2 text-gray-300">
-              <li>rebeca@example.com</li>
-              <li>+34 123 456 789</li>
-              <li>Barcelona, España</li>
+            <h4 className="text-lg font-semibold mb-4">Información Legal</h4>
+            <ul className="space-y-2">
+              <li><a href="/legal/aviso-legal" className="text-gray-300 hover:text-white transition duration-200">Aviso Legal</a></li>
+              <li><a href="/legal/politica-privacidad" className="text-gray-300 hover:text-white transition duration-200">Política de Privacidad</a></li>
+              <li><a href="/legal/politica-cookies" className="text-gray-300 hover:text-white transition duration-200">Política de Cookies</a></li>
             </ul>
           </div>
         </div>
