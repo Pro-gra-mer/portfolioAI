@@ -21,6 +21,7 @@ model User {
   projects    Project[]
   experiences Experience[]
   config      Config[]
+  legalPages  LegalPage[]
 }
 
 model Account {
@@ -101,6 +102,18 @@ model Config {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String   @db.Text
+  userId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LegalPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String   @db.Text
   userId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

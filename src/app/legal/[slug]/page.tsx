@@ -1,7 +1,6 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import ReactMarkdown from 'react-markdown';
 import { notFound } from 'next/navigation';
+import { PrismaClient } from '@prisma/client';
 
 interface LegalPageProps {
   params: {
@@ -16,21 +15,33 @@ const validPages = [
   'politica-cookies'
 ];
 
-// Función para obtener el contenido de un archivo Markdown
-async function getLegalContent(slug: string): Promise<string | null> {
-  try {
-    // Verificar que el slug sea válido
-    if (!validPages.includes(slug)) {
-      return null;
-    }
+const prisma = new PrismaClient();
 
-    const filePath = path.join(process.cwd(), 'src', 'app', 'legal', `${slug}.md`);
-    const content = await fs.readFile(filePath, 'utf8');
-    return content;
-  } catch (error) {
-    console.error(`Error reading legal file ${slug}:`, error);
-    return null;
-  }
+// Contenido por defecto y títulos
+function getPageTitle(slug: string): string {
+  const titles: Record<string, string> = {
+    'aviso-legal': 'Aviso Legal',
+    'politica-privacidad': 'Política de Privacidad',
+    'politica-cookies': 'Política de Cookies',
+  };
+  return titles[slug] || 'Página Legal';
+}
+
+function getDefaultContent(slug: string): string {
+  const defaults: Record<string, string> = {
+    'aviso-legal': `# Aviso Legal\n\n**Rebeca Pérez**\nDesarrolladora Web Full Stack\n\n## Información General\n\nEste sitio web es propiedad de Rebeca Pérez, con domicilio profesional en [Ciudad, País].\n\n## Contacto\n\nPara cualquier consulta relacionada con este sitio web, puede contactar a través de:\n- Email: [su-email@ejemplo.com]\n- Teléfono: [número de teléfono]\n\n## Propiedad Intelectual\n\nTodos los derechos de propiedad intelectual del contenido de este sitio web pertenecen a Rebeca Pérez. Queda prohibida la reproducción, distribución o modificación total o parcial del contenido sin autorización expresa.\n\n## Exclusión de Responsabilidad\n\nEl contenido de este sitio web se proporciona únicamente con fines informativos. Rebeca Pérez no se hace responsable de posibles errores u omisiones en la información proporcionada.\n\n## Legislación Aplicable\n\nEste sitio web se rige por la legislación española vigente.`,
+    'politica-privacidad': `# Política de Privacidad\n\n**Rebeca Pérez**\nDesarrolladora Web Full Stack\n\n## Información General\n\nEsta política de privacidad describe cómo se recopila, utiliza y protege la información personal que usted proporciona al utilizar este sitio web.\n\n## Información Recopilada\n\n### Información Personal\n- Nombre y apellidos\n- Dirección de correo electrónico\n- Número de teléfono (opcional)\n\n### Información Técnica\n- Dirección IP\n- Tipo de navegador\n- Páginas visitadas\n- Tiempo de permanencia en el sitio\n\n## Uso de la Información\n\nLa información recopilada se utiliza para:\n- Responder a consultas y solicitudes\n- Mejorar el contenido y funcionalidad del sitio\n- Enviar información relevante sobre servicios\n\n## Protección de Datos\n\nSe implementan medidas de seguridad técnicas y organizativas apropiadas para proteger sus datos personales contra el acceso no autorizado, alteración, divulgación o destrucción.\n\n## Derechos del Usuario\n\nDe acuerdo con la RGPD, usted tiene derecho a:\n- Acceso a sus datos personales\n- Rectificación de datos inexactos\n- Supresión de sus datos\n- Portabilidad de datos\n- Oposición al tratamiento\n\n## Cookies\n\nEste sitio web utiliza cookies técnicas necesarias para su funcionamiento básico. No se utilizan cookies de seguimiento o análisis sin consentimiento explícito.\n\n## Cambios en la Política\n\nEsta política de privacidad puede ser actualizada periódicamente. Se recomienda revisar esta página regularmente para estar informado de cualquier cambio.\n\n## Contacto\n\nPara ejercer sus derechos o realizar consultas sobre esta política, contacte a:\n- Email: [su-email@ejemplo.com]\n- Dirección: [su dirección física]\n\nÚltima actualización: Octubre 2025`,
+    'politica-cookies': `# Política de Cookies\n\n**Rebeca Pérez**\nDesarrolladora Web Full Stack\n\n## Información General\n\nEsta política explica cómo se utilizan las cookies y tecnologías similares en este sitio web.\n\n## ¿Qué son las Cookies?\n\nLas cookies son pequeños archivos de texto que se almacenan en su dispositivo cuando visita un sitio web. Permiten recordar sus preferencias y mejorar la experiencia de navegación.\n\n## Tipos de Cookies Utilizadas\n\n### Cookies Técnicas (Necesarias)\n- **Propósito**: Funcionamiento básico del sitio web\n- **Duración**: Sesión o persistentes\n- **Ejemplos**:\n  - Cookies de autenticación\n  - Cookies de seguridad\n  - Cookies de preferencias de idioma\n\n### Cookies de Análisis (Opcionales)\n- **Propósito**: Mejorar el sitio web mediante análisis de uso\n- **Duración**: Persistentes\n- **Herramientas**: Google Analytics (si se utiliza)\n\n## Gestión de Cookies\n\nPuede gestionar las cookies de las siguientes formas:\n\n### A través del Navegador\n- Chrome: Configuración > Privacidad y seguridad > Cookies\n- Firefox: Preferencias > Privacidad y seguridad > Cookies\n- Safari: Preferencias > Privacidad > Gestionar datos de sitios web\n- Edge: Configuración > Cookies y permisos del sitio\n\n### A través del Sitio Web\nUtilice la herramienta de configuración de cookies disponible en el sitio web (si está implementada).\n\n## Cookies de Terceros\n\nEste sitio web puede contener enlaces a sitios web de terceros que tienen sus propias políticas de cookies. No nos hacemos responsables del contenido o prácticas de privacidad de estos sitios.\n\n## Actualizaciones\n\nEsta política de cookies puede ser actualizada periódicamente para reflejar cambios en nuestras prácticas o en la legislación aplicable.\n\n## Contacto\n\nPara cualquier consulta sobre esta política de cookies, contacte a:\n- Email: [su-email@ejemplo.com]\n\nÚltima actualización: Octubre 2025`,
+  };
+  return defaults[slug] || `# ${getPageTitle(slug)}\n\nContenido de ${getPageTitle(slug).toLowerCase()}...`;
+}
+
+// Leer desde BD con fallback
+async function getLegalContent(slug: string): Promise<string | null> {
+  if (!validPages.includes(slug)) return null;
+  const page = await prisma.legalPage.findUnique({ where: { slug } }).catch(() => null);
+  if (page?.content) return page.content as string;
+  return getDefaultContent(slug);
 }
 
 // Metadata para SEO

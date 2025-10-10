@@ -291,7 +291,7 @@ export default function Dashboard() {
                   </button>
 
                   <button
-                    onClick={() => window.location.href = '/dashboard/legal'}
+                    onClick={() => window.location.href = '/dashboard/settings'}
                     className="p-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                   >
                     <div className="flex items-center space-x-3">

@@ -1,11 +1,100 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useScrollAnimation } from '../../components/useScrollAnimation';
 
 export default function Contact() {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
   const { ref: infoRef, isVisible: infoVisible } = useScrollAnimation(0.1);
   const { ref: formRef, isVisible: formVisible } = useScrollAnimation(0.1);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    project: '',
+    message: '',
+    privacy: false,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  // Dynamic location state
+  const [location, setLocation] = useState<string>('');
+  const [locationLoading, setLocationLoading] = useState<boolean>(true);
+
+  // Auto-hide success message after 3 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  // Fetch public location
+  useEffect(() => {
+    const loadLocation = async () => {
+      try {
+        const res = await fetch('/api/public/config/location', { cache: 'no-store' });
+        const data = await res.json();
+        setLocation(data?.location || '');
+      } catch (e) {
+        setLocation('');
+      } finally {
+        setLocationLoading(false);
+      }
+    };
+    loadLocation();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error enviando mensaje');
+      }
+
+      setSuccess(true);
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        project: '',
+        message: '',
+        privacy: false,
+      });
+    } catch (error: any) {
+      setError(error?.message || 'Error enviando mensaje');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -87,32 +176,6 @@ export default function Contact() {
 
               <div className="space-y-8">
                 <div className="flex items-start space-x-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Email</h3>
-                    <p className="text-gray-600 dark:text-gray-400">rebeca@example.com</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Respuesta en 24 horas</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Teléfono</h3>
-                    <p className="text-gray-600 dark:text-gray-400">+34 123 456 789</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Llamadas y WhatsApp</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-6">
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0">
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -121,35 +184,15 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Ubicación</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Barcelona, España</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {locationLoading ? 'Cargando ubicación...' : (location || 'No especificada')}
+                    </p>
                     <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Disponible para remoto global</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                  ¿Por qué trabajar conmigo?
-                </h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-600 dark:text-gray-400">
-                    <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-3"></span>
-                    Especialización en IA aplicada al desarrollo web
-                  </li>
-                  <li className="flex items-center text-gray-600 dark:text-gray-400">
-                    <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-3"></span>
-                    Más de 5 años de experiencia en proyectos reales
-                  </li>
-                  <li className="flex items-center text-gray-600 dark:text-gray-400">
-                    <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-3"></span>
-                    Comunicación clara y transparente durante todo el proceso
-                  </li>
-                  <li className="flex items-center text-gray-600 dark:text-gray-400">
-                    <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-3"></span>
-                    Entrega de proyectos de alta calidad dentro de los plazos
-                  </li>
-                </ul>
-              </div>
+              
             </div>
 
             {/* Contact Form */}
@@ -167,7 +210,7 @@ export default function Contact() {
                   Cuéntame sobre tu proyecto y te responderé lo antes posible
                 </p>
 
-                <form className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -177,9 +220,12 @@ export default function Contact() {
                         type="text"
                         id="name"
                         name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                         placeholder="Tu nombre"
                         required
+                        disabled={loading}
                       />
                     </div>
                     <div>
@@ -190,9 +236,12 @@ export default function Contact() {
                         type="email"
                         id="email"
                         name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                         placeholder="tu@email.com"
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -205,8 +254,11 @@ export default function Contact() {
                       type="text"
                       id="company"
                       name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       placeholder="Nombre de tu empresa (opcional)"
+                      disabled={loading}
                     />
                   </div>
 
@@ -217,34 +269,18 @@ export default function Contact() {
                     <select
                       id="project"
                       name="project"
+                      value={formData.project}
+                      onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       required
+                      disabled={loading}
                     >
                       <option value="">Selecciona una opción</option>
                       <option value="web">Desarrollo web</option>
                       <option value="ai">Integración de IA</option>
                       <option value="ecommerce">E-commerce</option>
                       <option value="mobile">Aplicación móvil</option>
-                      <option value="consulting">Consultoría técnica</option>
                       <option value="other">Otro</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Presupuesto aproximado
-                    </label>
-                    <select
-                      id="budget"
-                      name="budget"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    >
-                      <option value="">Selecciona un rango</option>
-                      <option value="small">Menos de 5.000€</option>
-                      <option value="medium">5.000€ - 15.000€</option>
-                      <option value="large">15.000€ - 50.000€</option>
-                      <option value="enterprise">Más de 50.000€</option>
-                      <option value="discuss">Por discutir</option>
                     </select>
                   </div>
 
@@ -256,9 +292,12 @@ export default function Contact() {
                       id="message"
                       name="message"
                       rows={6}
+                      value={formData.message}
+                      onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                      placeholder="Cuéntame sobre tu proyecto, objetivos, funcionalidades deseadas, tecnologías preferidas..."
+                      placeholder="Cuéntame sobre tu proyecto u objetivo"
                       required
+                      disabled={loading}
                     ></textarea>
                   </div>
 
@@ -267,19 +306,46 @@ export default function Contact() {
                       type="checkbox"
                       id="privacy"
                       name="privacy"
+                      checked={formData.privacy}
+                      onChange={handleInputChange}
                       className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       required
+                      disabled={loading}
                     />
                     <label htmlFor="privacy" className="text-sm text-gray-600 dark:text-gray-400">
                       Acepto la política de privacidad y el tratamiento de mis datos personales.
                     </label>
                   </div>
 
+                  {/* Success Message */}
+                  {success && (
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+                      <p className="text-green-600 dark:text-green-400 text-sm">
+                        ✅ ¡Mensaje enviado correctamente! Te responderé lo antes posible.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {error && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                      <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                    disabled={loading || !formData.privacy}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl disabled:scale-100 disabled:shadow-lg disabled:cursor-not-allowed"
                   >
-                    Enviar mensaje
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Enviando mensaje...
+                      </div>
+                    ) : (
+                      'Enviar mensaje'
+                    )}
                   </button>
                 </form>
               </div>

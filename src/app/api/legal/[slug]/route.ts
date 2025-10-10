@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { authOptions } from '../../auth/[...nextauth]/route.js';
 
 // Lista de páginas legales válidas
 const validPages = [
   'aviso-legal',
   'politica-privacidad',
-  'politica-cookies'
+  'politica-cookies',
 ];
+
+const prisma = new PrismaClient();
 
 // GET /api/legal/[slug] - Obtener contenido de página legal
 export async function GET(
@@ -25,24 +30,18 @@ export async function GET(
       );
     }
 
-    const filePath = path.join(process.cwd(), 'src', 'app', 'legal', `${slug}.md`);
-
-    try {
-      const content = await fs.readFile(filePath, 'utf8');
-
-      return NextResponse.json({
-        slug,
-        title: getPageTitle(slug),
-        content,
-      });
-    } catch (error) {
-      // Si el archivo no existe, devolver contenido por defecto
-      return NextResponse.json({
-        slug,
-        title: getPageTitle(slug),
-        content: getDefaultContent(slug),
-      });
+    // Buscar en base de datos
+    const page = await prisma.legalPage.findUnique({ where: { slug } });
+    if (page) {
+      return NextResponse.json({ slug, title: page.title, content: page.content });
     }
+
+    // Si no existe en BD, devolver contenido por defecto (sin crear registro aún)
+    return NextResponse.json({
+      slug,
+      title: getPageTitle(slug),
+      content: getDefaultContent(slug),
+    });
   } catch (error) {
     console.error('Error getting legal page:', error);
     return NextResponse.json(
@@ -68,6 +67,13 @@ export async function PUT(
       );
     }
 
+    // Requiere sesión
+    const session = (await getServerSession(authOptions as any)) as unknown as any;
+    const userId = session?.user?.id as string | undefined;
+    if (!userId) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { content } = body;
 
@@ -78,19 +84,26 @@ export async function PUT(
       );
     }
 
-    const filePath = path.join(process.cwd(), 'src', 'app', 'legal', `${slug}.md`);
-
-    // Crear directorio si no existe
-    const dir = path.dirname(filePath);
-    await fs.mkdir(dir, { recursive: true });
-
-    // Escribir archivo
-    await fs.writeFile(filePath, content, 'utf8');
+    // Guardar en base de datos (upsert)
+    const saved = await prisma.legalPage.upsert({
+      where: { slug },
+      create: {
+        slug,
+        title: getPageTitle(slug),
+        content,
+        userId,
+      },
+      update: {
+        title: getPageTitle(slug),
+        content,
+        userId,
+      },
+    });
 
     return NextResponse.json({
       message: 'Página legal actualizada correctamente',
       slug,
-      title: getPageTitle(slug),
+      title: saved.title,
     });
   } catch (error) {
     console.error('Error updating legal page:', error);

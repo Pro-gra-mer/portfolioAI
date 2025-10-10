@@ -24,6 +24,11 @@ export default function Settings() {
     confirmPassword: '',
   });
 
+  // Location state (public profile setting)
+  const [location, setLocation] = useState('');
+  const [locationLoading, setLocationLoading] = useState(true);
+  const [savingLocation, setSavingLocation] = useState(false);
+
   useEffect(() => {
     if (status === 'loading') return;
     if (!session) {
@@ -31,6 +36,47 @@ export default function Settings() {
       return;
     }
   }, [session, status, router]);
+
+  // Load current public location once authenticated
+  useEffect(() => {
+    const loadLocation = async () => {
+      if (status !== 'authenticated') return;
+      try {
+        setLocationLoading(true);
+        const res = await fetch('/api/config/location', { cache: 'no-store' });
+        const data = await res.json();
+        if (res.ok) {
+          setLocation(data?.location || '');
+        }
+      } catch (e) {
+        // ignore, UI will allow setting it anyway
+      } finally {
+        setLocationLoading(false);
+      }
+    };
+    loadLocation();
+  }, [status]);
+
+  const handleLocationSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingLocation(true);
+      setError('');
+      setMessage('');
+      const res = await fetch('/api/config/location', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Error guardando ubicación');
+      setMessage('Ubicación actualizada correctamente');
+    } catch (err: any) {
+      setError(err?.message || 'Error guardando ubicación');
+    } finally {
+      setSavingLocation(false);
+    }
+  };
 
   const handleEmailUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -306,6 +352,42 @@ export default function Settings() {
                 >
                   {loading ? 'Actualizando...' : 'Actualizar Contraseña'}
                 </button>
+              </form>
+            </div>
+
+            {/* Public Location Setting */}
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Ubicación pública
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Esta ubicación se mostrará en la página de contacto. Puedes dejarla vacía si no quieres mostrarla.
+              </p>
+
+              <form onSubmit={handleLocationSave} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Ubicación
+                  </label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    disabled={locationLoading || savingLocation}
+                    placeholder="Ej: Barcelona, España"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={locationLoading || savingLocation}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingLocation ? 'Guardando...' : 'Guardar ubicación'}
+                  </button>
+                </div>
               </form>
             </div>
 
