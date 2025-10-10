@@ -91,16 +91,37 @@ export default function FeaturedProjectSection() {
         }`}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative group">
-              <div className={`aspect-video ${featuredProject.bgColor} rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500`}>
-                <div className="text-center text-white">
-                  <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z" />
-                    </svg>
+              <div className={`aspect-video ${featuredProject.bgColor} rounded-3xl relative overflow-hidden shadow-2xl group-hover:scale-105 transition-transform duration-500`}>
+                {featuredProject.imageUrl ? (
+                  <>
+                    <img
+                      src={featuredProject.imageUrl}
+                      alt={featuredProject.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs text-white">
+                        {featuredProject.category}
+                      </span>
+                      <h3 className="mt-2 text-2xl font-semibold text-white drop-shadow">
+                        {featuredProject.title}
+                      </h3>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-center text-white">
+                    <div>
+                      <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-2xl font-semibold">{featuredProject.title}</h3>
+                      <p className="text-sm opacity-90 mt-2">{featuredProject.category}</p>
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-semibold">{featuredProject.title}</h3>
-                  <p className="text-sm opacity-90 mt-2">{featuredProject.category}</p>
-                </div>
+                )}
               </div>
             </div>
 
