@@ -4,7 +4,7 @@ import type { Session } from 'next-auth';
 // Importar desde el archivo JS y castear para evitar conflictos de tipos en TS
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

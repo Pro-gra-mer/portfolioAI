@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 interface Experience {
@@ -17,6 +17,7 @@ interface Experience {
 export default function ManageExperience() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -36,8 +37,14 @@ export default function ManageExperience() {
       router.push('/auth/signin');
       return;
     }
+
+    // Mostrar formulario automáticamente si viene de añadir experiencia
+    if (searchParams.get('action') === 'add') {
+      setShowForm(true);
+    }
+
     fetchExperiences();
-  }, [session, status, router]);
+  }, [session, status, router, searchParams]);
 
   const fetchExperiences = async () => {
     try {

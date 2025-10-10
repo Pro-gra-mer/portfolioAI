@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import type { Session } from 'next-auth';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

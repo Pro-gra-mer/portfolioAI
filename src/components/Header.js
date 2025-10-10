@@ -17,7 +17,7 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white hover:text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transition-all duration-300 hover:scale-105">
-            Rebeca Portfolio
+            Rebeca Pérez
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
