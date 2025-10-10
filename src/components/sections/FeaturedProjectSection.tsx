@@ -118,18 +118,15 @@ export default function FeaturedProjectSection() {
               </div>
 
               <div className="grid grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{featuredProject.metrics.users}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Usuarios activos</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{featuredProject.metrics.accuracy}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Precisión</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{featuredProject.metrics.satisfaction}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Satisfacción</div>
-                </div>
+                {Object.entries(featuredProject.metrics || {})
+                  .filter(([k]) => !['users','accuracy','satisfaction','conversion','engagement','revenue','retention'].includes(k))
+                  .slice(0,3)
+                  .map(([model, percent]) => (
+                    <div key={model} className="text-center">
+                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{String(percent)}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{model}</div>
+                    </div>
+                  ))}
               </div>
 
               {/* Tecnologías utilizadas */}

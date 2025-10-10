@@ -6,10 +6,9 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
 // Form shape aligned with creation page and API contract
-type Metrics = {
-  users: string;
-  accuracy: string;
-  satisfaction: string;
+type ModelUsage = {
+  model: string;
+  percent: string;
 };
 
 type FormData = {
@@ -22,7 +21,7 @@ type FormData = {
   textColor: string;
   bgColor: string;
   features: string[];
-  metrics: Metrics;
+  metrics: ModelUsage[];
 };
 
 export default function EditProjectPage() {
@@ -45,11 +44,9 @@ export default function EditProjectPage() {
     textColor: "text-white",
     bgColor: "bg-gradient-to-br from-blue-500 to-purple-600",
     features: [""],
-    metrics: {
-      users: "",
-      accuracy: "",
-      satisfaction: "",
-    },
+    metrics: [
+      { model: "", percent: "" },
+    ],
   });
 
   const gradientOptions = [
@@ -102,7 +99,12 @@ export default function EditProjectPage() {
 
         const technologies = parseMaybeJson(project.technologies, []);
         const features = parseMaybeJson(project.features, []);
-        const metrics = parseMaybeJson(project.metrics, { users: "", accuracy: "", satisfaction: "" });
+        const metricsObj = parseMaybeJson(project.metrics, {} as Record<string, string>);
+        // Transformar objeto { modelo: porcentaje } a lista [{model, percent}]
+        const entries = Object.entries(metricsObj || {}).map(([model, percent]) => ({ model, percent: String(percent ?? "") }));
+        // Filtrar claves antiguas si existieran
+        const legacyKeys = new Set(["users", "accuracy", "satisfaction"]);
+        const modelUsage = entries.filter(e => !legacyKeys.has(e.model));
 
         setFormData({
           title: project.title || "",
@@ -114,11 +116,7 @@ export default function EditProjectPage() {
           textColor: project.textColor || "text-white",
           bgColor: project.bgColor || `bg-gradient-to-br ${project.gradient || "from-blue-500 to-purple-600"}`,
           features: Array.isArray(features) && features.length > 0 ? features : [""],
-          metrics: {
-            users: metrics?.users || "",
-            accuracy: metrics?.accuracy || "",
-            satisfaction: metrics?.satisfaction || "",
-          },
+          metrics: modelUsage.length > 0 ? modelUsage : [{ model: "", percent: "" }],
         });
       } catch (e: any) {
         setError(e.message || "Error cargando el proyecto");
@@ -140,12 +138,21 @@ export default function EditProjectPage() {
     setError("");
 
     try {
+      // Convertir lista de usos a objeto { [modelo]: porcentaje }
+      const metricsObj = Object.fromEntries(
+        (formData.metrics || [])
+          .filter(m => m.model?.trim())
+          .map(m => [m.model.trim(), (m.percent || "").toString().trim()])
+      );
+
+      const payload = { ...formData, metrics: metricsObj } as any;
+
       const res = await fetch(`/api/projects/${projectId}` , {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -193,10 +200,24 @@ export default function EditProjectPage() {
     }));
   };
 
-  const updateMetrics = (field: keyof Metrics, value: string) => {
+  const addModelUsage = () => {
     setFormData(prev => ({
       ...prev,
-      metrics: { ...prev.metrics, [field]: value },
+      metrics: [...prev.metrics, { model: "", percent: "" }],
+    }));
+  };
+
+  const updateModelUsage = (index: number, field: "model" | "percent", value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      metrics: prev.metrics.map((m, i) => (i === index ? { ...m, [field]: value } : m)),
+    }));
+  };
+
+  const removeModelUsage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      metrics: prev.metrics.filter((_, i) => i !== index),
     }));
   };
 
@@ -436,54 +457,56 @@ export default function EditProjectPage() {
                 </div>
               </div>
 
-              {/* Métricas */}
+              {/* Uso de modelos de IA */}
               <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  Métricas del Proyecto
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label htmlFor="users" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Usuarios / Alcance
-                    </label>
-                    <input
-                      type="text"
-                      id="users"
-                      value={formData.metrics.users}
-                      onChange={(e) => updateMetrics('users', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Ej: 10,000+"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="accuracy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Métrica Principal
-                    </label>
-                    <input
-                      type="text"
-                      id="accuracy"
-                      value={formData.metrics.accuracy}
-                      onChange={(e) => updateMetrics('accuracy', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Ej: 94%"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="satisfaction" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Métrica Secundaria
-                    </label>
-                    <input
-                      type="text"
-                      id="satisfaction"
-                      value={formData.metrics.satisfaction}
-                      onChange={(e) => updateMetrics('satisfaction', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Ej: 4.8/5"
-                    />
-                  </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Uso de los modelos de IA</h3>
+                <div className="space-y-4">
+                  {formData.metrics.map((m, index) => (
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                      <div className="md:col-span-6">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Modelo</label>
+                        <input
+                          type="text"
+                          value={m.model}
+                          onChange={(e) => updateModelUsage(index, 'model', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          placeholder="Ej: GPT-4o, Llama 3, Claude..."
+                        />
+                      </div>
+                      <div className="md:col-span-4">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Porcentaje de uso</label>
+                        <input
+                          type="text"
+                          value={m.percent}
+                          onChange={(e) => updateModelUsage(index, 'percent', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          placeholder="Ej: 60%"
+                        />
+                      </div>
+                      <div className="md:col-span-2 flex md:justify-end">
+                        {formData.metrics.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeModelUsage(index)}
+                            className="p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                            aria-label="Eliminar modelo"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addModelUsage}
+                    className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                    <span>Agregar modelo</span>
+                  </button>
                 </div>
               </div>
 

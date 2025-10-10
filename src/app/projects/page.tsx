@@ -159,7 +159,7 @@ export default function Projects() {
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-1000 delay-500 ${
             projectsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
-            {(projects.length > 1 ? projects.slice(1) : projects).map((project, index) => (
+            {projects.map((project, index) => (
               <div
                 key={project.id}
                 className={`group relative bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-800 hover:scale-105`}
@@ -182,24 +182,20 @@ export default function Projects() {
                   <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
                     {project.title}
                   </h3>
-
                   <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
                     {project.description}
                   </p>
 
                   <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{project.metrics.users}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Usuarios</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">{project.metrics.conversion || project.metrics.accuracy || project.metrics.engagement}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Métrica</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{project.metrics.satisfaction || project.metrics.revenue || project.metrics.retention}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Valor</div>
-                    </div>
+                    {Object.entries(project.metrics || {})
+                      .filter(([k]) => !['users','accuracy','satisfaction','conversion','engagement','revenue','retention'].includes(k))
+                      .slice(0, 3)
+                      .map(([model, percent]) => (
+                        <div key={model} className="text-center">
+                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{String(percent)}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{model}</div>
+                        </div>
+                    ))}
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-6">

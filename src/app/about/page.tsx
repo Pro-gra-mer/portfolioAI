@@ -3,6 +3,34 @@
 import { useState, useEffect } from 'react';
 import { useScrollAnimation } from '../../components/useScrollAnimation';
 
+interface AboutContent {
+  hero: {
+    mainTitle: string;
+    subtitle: string;
+    description: string;
+    ctaText: string;
+    ctaLink: string;
+  };
+  story: {
+    title: string;
+    content: string;
+    philosophy: {
+      title: string;
+      content: string;
+    };
+  };
+  skills: {
+    frontend: string[];
+    backend: string[];
+    ai: string[];
+    database: string[];
+  };
+  images: {
+    profileImage?: string;
+    heroImage?: string;
+  };
+}
+
 interface Experience {
   id: string;
   position: string;
@@ -19,12 +47,54 @@ export default function About() {
   const { ref: experienceRef, isVisible: experienceVisible } = useScrollAnimation(0.1);
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation(0.1);
 
+  const [content, setContent] = useState<AboutContent>({
+    hero: {
+      mainTitle: 'Pasión por la innovación tecnológica',
+      subtitle:
+        'Desarrolladora web fullstack especializada en inteligencia artificial, transformando ideas complejas en soluciones digitales elegantes y funcionales.',
+      description: '',
+      ctaText: 'Ver proyectos',
+      ctaLink: '/projects',
+    },
+    story: {
+      title: 'Mi trayectoria',
+      content:
+        'Desarrolladora web con una historia de transformación y pasión por la tecnología. En 2023, decidí dar un giro completo a mi vida laboral, para dejar atrás el sector de la limpieza y dedicarme al desarrollo web, un campo donde las horas vuelan y la creatividad no tiene límites.\n\nMe formé en diferentes plataformas online como: PixelPro, Udemy, Pildorasinformáticas y Grupo Atrium, adquiriendo experiencia en lenguajes y frameworks modernos como JavaScript, Java, Angular y Spring Boot. Me encantan los desafíos de resolver problemas y construir aplicaciones atractivas y funcionales que marquen la diferencia.\n\nGracias a la formación recibida y a mi esfuerzo constante, he logrado alcanzar mi objetivo de dedicarme profesionalmente al desarrollo web. Este proyecto representa un paso clave en mi trayectoria, al permitirme consolidar mis conocimientos y aplicarlos en un entorno real, uniendo diseño, funcionalidad y experiencia de usuario.\n\nMi transición profesional me ha enseñado que la dedicación y el aprendizaje continuo son clave para el éxito. Mi experiencia previa me dio habilidades como la adaptabilidad y la atención al detalle, valores que ahora aplico al desarrollo web.',
+      philosophy: {
+        title: 'Filosofía de desarrollo',
+        content:
+          '"El futuro del desarrollo está en la unión entre la creatividad humana y la inteligencia artificial. Aprovechar su potencial nos permite construir soluciones más inteligentes, eficientes y con un impacto real."',
+      },
+    },
+    skills: {
+      frontend: ['Angular', 'JavaScript', 'Tailwind CSS', 'Responsive Design'],
+      backend: ['Spring Boot', 'Java', 'REST APIs', 'Laravel'],
+      ai: ['OpenAI & GPT', 'Windsurf Editor', 'N8N', 'Chatbots Inteligentes'],
+      database: ['MySQL', 'MongoDB', 'Prisma ORM'],
+    },
+    images: {},
+  });
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    fetchContent();
     fetchExperiences();
   }, []);
+
+  const fetchContent = async () => {
+    try {
+      const response = await fetch('/api/about');
+      if (response.ok) {
+        const data = await response.json();
+        setContent(data.content);
+      }
+    } catch (error) {
+      console.error('Error obteniendo contenido about:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchExperiences = async () => {
     try {
@@ -36,19 +106,23 @@ export default function About() {
       }
     } catch (error) {
       console.error('Error obteniendo experiencia laboral:', error);
-    } finally {
-      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Hero Section - Apple Style */}
       <section
         ref={heroRef}
-        className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
-          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
       >
         {/* Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900"></div>
@@ -72,29 +146,28 @@ export default function About() {
               heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
             }`}>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
-                Pasión por la
+                {content.hero.mainTitle.split(' ').slice(0, 2).join(' ')}
               </span>
               <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-                innovación tecnológica
+                {content.hero.mainTitle.split(' ').slice(2).join(' ')}
               </span>
             </h1>
 
             <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto leading-relaxed transition-all duration-1000 delay-700 ${
               heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
             }`}>
-              Desarrolladora web fullstack especializada en inteligencia artificial,
-              transformando ideas complejas en soluciones digitales elegantes y funcionales.
+              {content.hero.subtitle}
             </p>
 
             <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-900 ${
               heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
             }`}>
               <a
-                href="/projects"
+                href={content.hero.ctaLink}
                 className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <span className="relative z-10">Ver proyectos</span>
+                <span className="relative z-10">{content.hero.ctaText}</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
               <a
@@ -128,39 +201,41 @@ export default function About() {
               storyVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
             }`}>
               <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
-                Mi trayectoria
+                {content.story.title}
               </h2>
               <div className="space-y-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-                <p>
-                  Desarrolladora web con una historia de transformación y pasión por la tecnología. En 2023, decidí dar un giro completo a mi vida laboral, para dejar atrás el sector de la limpieza y dedicarme al desarrollo web, un campo donde las horas vuelan y la creatividad no tiene límites.
-                </p>
-                <p>
-                  Me formé en diferentes plataformas online como: PixelPro, Udemy, Pildorasinformáticas y Grupo Atrium, adquiriendo experiencia en lenguajes y frameworks modernos como JavaScript, Java, Angular y Spring Boot. Me encantan los desafíos de resolver problemas y construir aplicaciones atractivas y funcionales que marquen la diferencia.
-                </p>
-                <p>
-                Gracias a la formación recibida y a mi esfuerzo constante, he logrado alcanzar mi objetivo de dedicarme profesionalmente al desarrollo web. Este proyecto representa un paso clave en mi trayectoria, al permitirme consolidar mis conocimientos y aplicarlos en un entorno real, uniendo diseño, funcionalidad y experiencia de usuario.
-                </p>
-                <p>
-                  Mi transición profesional me ha enseñado que la dedicación y el aprendizaje continuo son clave para el éxito. Mi experiencia previa me dio habilidades como la adaptabilidad y la atención al detalle, valores que ahora aplico al desarrollo web.
-                </p>
-                <p>
-                  Fuera del código, disfruto de la lectura, el deporte y la videografía, actividades que me inspiran a seguir creciendo tanto personal como profesionalmente.
-                </p>
+                {content.story.content.split('\n\n').map((paragraph, index) => (
+                  <p key={index}>
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             </div>
 
             <div className={`relative transition-all duration-1000 delay-500 ${
               storyVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
             }`}>
+              {/* Profile Image (optional) */}
+              {content.images.profileImage && (
+                <div className="mb-8 flex justify-center lg:justify-start">
+                  <img
+                    src={content.images.profileImage}
+                    alt="Foto de perfil"
+                    className="w-48 h-48 md:w-64 md:h-64 rounded-3xl object-cover shadow-2xl ring-1 ring-black/5 dark:ring-white/10"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+
               <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl p-8 text-white">
                 <div className="absolute top-4 right-4 w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
                   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-semibold mb-4">Filosofía de desarrollo</h3>
+                <h3 className="text-2xl font-semibold mb-4">{content.story.philosophy.title}</h3>
                 <p className="text-blue-100 leading-relaxed">
-                “El futuro del desarrollo está en la unión entre la creatividad humana y la inteligencia artificial. Aprovechar su potencial nos permite construir soluciones más inteligentes, eficientes y con un impacto real.”
+                  {content.story.philosophy.content}
                 </p>
               </div>
             </div>
@@ -201,10 +276,9 @@ export default function About() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Frontend</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• Angular</li>
-                  <li>• JavaScript</li>
-                  <li>• Tailwind CSS</li>
-                  <li>• Responsive Design</li>
+                  {content.skills.frontend.map((skill, index) => (
+                    <li key={index}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -219,11 +293,10 @@ export default function About() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Backend</h3>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">                  
-                  <li>• Spring Boot</li>
-                  <li>• Java </li>
-                  <li>• REST APIs</li>
-                  <li>• Laravel</li>                  
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  {content.skills.backend.map((skill, index) => (
+                    <li key={index}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -239,10 +312,9 @@ export default function About() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">IA/ML</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• OpenAI & GPT</li>
-                  <li>• Windsurf Editor</li>
-                  <li>• N8N</li>
-                  <li>• Chatbots Inteligentes</li>
+                  {content.skills.ai.map((skill, index) => (
+                    <li key={index}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -258,9 +330,9 @@ export default function About() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Bases de Datos</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• MySQL</li>
-                  <li>• MongoDB</li>              
-                  <li>• Prisma ORM</li>
+                  {content.skills.database.map((skill, index) => (
+                    <li key={index}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -277,7 +349,7 @@ export default function About() {
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className={`text-center mb-20 transition-all duration-1000 delay-300 ${
-            experienceRef ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            experienceVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
           }`}>
             <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
               Experiencia profesional
@@ -287,9 +359,6 @@ export default function About() {
             </p>
           </div>
 
-          <div className={`relative transition-all duration-1000 delay-500 ${
-            experienceVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
           <div className={`relative transition-all duration-1000 delay-500 ${
             experienceVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
@@ -341,7 +410,6 @@ export default function About() {
                 ))
               )}
             </div>
-          </div>
           </div>
         </div>
       </section>

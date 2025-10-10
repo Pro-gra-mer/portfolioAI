@@ -6,15 +6,45 @@ export default function HeroSection() {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
 
   return (
-    <section
-      ref={heroRef}
-      className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
-        heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-      }`}
-    >
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900"></div>
-
+    <>
+      <style jsx>{`
+        @keyframes gradientShift {
+          0% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0.7;
+            transform: scale(1.05);
+          }
+        }
+      `}</style>
+      <section
+        ref={heroRef}
+        className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
+          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
+      {/* Background: Left BG, Right Video - Gradient Fusion */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900">
+        {/* Video with Horizontal Gradient Mask - Right Visible, Left Invisible */}
+        <video
+          autoPlay
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          style={{
+            maskImage: `linear-gradient(to right, transparent 0%, transparent 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)`,
+            WebkitMaskImage: `linear-gradient(to right, transparent 0%, transparent 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)`
+          }}
+          onError={(e) => {
+            console.log('Video not found, hiding video');
+            e.currentTarget.style.display = 'none';
+          }}
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+      </div>
       {/* Animated Gradient Orbs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-20 animate-blob"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
@@ -76,5 +106,6 @@ export default function HeroSection() {
         </svg>
       </div>
     </section>
+    </>
   );
 }
