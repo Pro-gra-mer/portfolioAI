@@ -146,6 +146,7 @@ export async function POST(request: NextRequest) {
       gradient,
       textColor,
       bgColor,
+      videoUrl,
       features,
       metrics,
     } = body;
@@ -159,7 +160,8 @@ export async function POST(request: NextRequest) {
     }
 
     const newProject = await prisma.project.create({
-      data: {
+      // Cast until prisma generate updates types with `videoUrl`
+      data: ({
         title,
         category,
         description,
@@ -168,10 +170,11 @@ export async function POST(request: NextRequest) {
         gradient,
         textColor: textColor || 'text-white',
         bgColor,
+        videoUrl: videoUrl || null,
         features: JSON.stringify(features || []),
         metrics: JSON.stringify(metrics || {}),
         userId: userId,
-      },
+      } as any),
     });
 
     return NextResponse.json({

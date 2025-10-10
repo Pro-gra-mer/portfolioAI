@@ -68,6 +68,7 @@ model Project {
   gradient        String
   textColor       String
   bgColor         String
+  videoUrl        String?  // URL opcional de YouTube/Vimeo para embeber
   features        Json     // Array de strings
   metrics         Json     // Objeto con métricas
   isFeatured      Boolean  @default(false)

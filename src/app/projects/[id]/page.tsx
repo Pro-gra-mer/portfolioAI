@@ -1,6 +1,7 @@
 
 import Link from "next/link";
 import prisma from "../../../../lib/prisma";
+import ProjectVideoEmbed from "@/components/ProjectVideoEmbed";
 
 function parseMaybeJson<T>(val: any, fallback: T): T {
   if (val == null) return fallback;
@@ -33,6 +34,7 @@ export default async function ProjectDetail({ params }: { params: { id: string }
 
   const gradient = project.bgColor || `bg-gradient-to-br ${project.gradient}`;
   const textColor = project.textColor || "text-white";
+  const videoUrl = (project as any).videoUrl as string | undefined;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -61,6 +63,14 @@ export default async function ProjectDetail({ params }: { params: { id: string }
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{project.longDescription || project.description}</p>
             </div>
+
+            {/* Video embed (YouTube/Vimeo) */}
+            {videoUrl && (
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Demo en vídeo</h3>
+                <ProjectVideoEmbed videoUrl={videoUrl} />
+              </div>
+            )}
 
             {features.length > 0 && (
               <div className="mt-10">

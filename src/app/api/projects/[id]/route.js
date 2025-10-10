@@ -101,6 +101,7 @@ export async function PUT(
       features,
       metrics,
       isFeatured,
+      videoUrl,
     } = body;
 
     const updatedProject = await prisma.project.update({
@@ -119,6 +120,7 @@ export async function PUT(
         ...(features && { features: JSON.stringify(features) }),
         ...(metrics && { metrics: JSON.stringify(metrics) }),
         ...(isFeatured !== undefined && { isFeatured }),
+        ...(videoUrl !== undefined && { videoUrl }),
       },
     });
 

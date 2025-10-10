@@ -20,6 +20,7 @@ type FormData = {
   gradient: string;
   textColor: string;
   bgColor: string;
+  videoUrl: string;
   features: string[];
   metrics: ModelUsage[];
 };
@@ -43,6 +44,7 @@ export default function EditProjectPage() {
     gradient: "from-blue-500 to-purple-600",
     textColor: "text-white",
     bgColor: "bg-gradient-to-br from-blue-500 to-purple-600",
+    videoUrl: "",
     features: [""],
     metrics: [
       { model: "", percent: "" },
@@ -115,6 +117,7 @@ export default function EditProjectPage() {
           gradient: project.gradient || "from-blue-500 to-purple-600",
           textColor: project.textColor || "text-white",
           bgColor: project.bgColor || `bg-gradient-to-br ${project.gradient || "from-blue-500 to-purple-600"}`,
+          videoUrl: project.videoUrl || "",
           features: Array.isArray(features) && features.length > 0 ? features : [""],
           metrics: modelUsage.length > 0 ? modelUsage : [{ model: "", percent: "" }],
         });
@@ -322,6 +325,20 @@ export default function EditProjectPage() {
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                     placeholder="Descripción más detallada del proyecto, características principales, etc."
                   />
+                </div>
+
+                {/* Video URL */}
+                <div className="mt-6">
+                  <label htmlFor="videoUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vídeo del proyecto (YouTube o Vimeo)</label>
+                  <input
+                    type="url"
+                    id="videoUrl"
+                    value={formData.videoUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
+                  />
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Pega un enlace de YouTube o Vimeo. Lo mostraremos embebido en la ficha del proyecto.</p>
                 </div>
               </div>
 
