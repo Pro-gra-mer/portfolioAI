@@ -16,9 +16,9 @@ export default function HeroSection() {
     gradientStart: number;
     gradientEnd: number;
   }>({
-    h1: 'Desarrolladora Web Fullstack',
-    subtitle: 'Creando el futuro con IA y código',
-    description: 'Transformo ideas en experiencias digitales excepcionales, combinando desarrollo web avanzado con inteligencia artificial.',
+    h1: '',
+    subtitle: '',
+    description: '',
     gradientStart: 0,
     gradientEnd: 0
   });
@@ -62,9 +62,9 @@ export default function HeroSection() {
         const data = await res.json();
         if (cancelled) return;
         setHeroText({
-          h1: String(data?.h1 || 'Desarrolladora Web Fullstack'),
-          subtitle: String(data?.subtitle || 'Creando el futuro con IA y código'),
-          description: String(data?.description || 'Transformo ideas en experiencias digitales excepcionales, combinando desarrollo web avanzado con inteligencia artificial.'),
+          h1: String(data?.h1 || ''),
+          subtitle: String(data?.subtitle || ''),
+          description: String(data?.description || ''),
           gradientStart: Number(data?.gradientStart || 0),
           gradientEnd: Number(data?.gradientEnd || 0),
         });
@@ -169,66 +169,77 @@ export default function HeroSection() {
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <div className="space-y-8">
-            <div className={`inline-block transition-all duration-1000 delay-300 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-            }`}>
-              <span className={`text-sm font-semibold tracking-wider text-gray-600 dark:text-gray-400 uppercase transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                {heroText.h1}
-              </span>
-            </div>
+            {heroText.h1 && heroText.subtitle && heroText.description ? (
+              <>
+                <div className={`inline-block transition-all duration-1000 delay-300 ${
+                  heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                }`}>
+                  <span className={`text-sm font-semibold tracking-wider text-gray-600 dark:text-gray-400 uppercase transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                    {heroText.h1}
+                  </span>
+                </div>
 
-            <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight transition-all duration-1000 delay-500 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-            }`}>
-              {(() => {
-                const sub = heroText.subtitle;
-                const len = sub.length;
-                const s = Math.max(0, Math.min(Number(heroText.gradientStart), len));
-                const e = Math.max(0, Math.min(Number(heroText.gradientEnd), len));
-                const start = Math.min(s, e);
-                const end = Math.max(s, e);
-                const a = sub.slice(0, start);
-                const b = sub.slice(start, end);
-                const c = sub.slice(end);
-                return (
-                  <>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
-                      {a}
-                    </span>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-                      {b}
-                    </span>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
-                      {c}
-                    </span>
-                  </>
-                );
-              })()}
-            </h1>
+                <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight transition-all duration-1000 delay-500 ${
+                  heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                }`}>
+                  {(() => {
+                    const sub = heroText.subtitle;
+                    const len = sub.length;
+                    const s = Math.max(0, Math.min(Number(heroText.gradientStart), len));
+                    const e = Math.max(0, Math.min(Number(heroText.gradientEnd), len));
+                    const start = Math.min(s, e);
+                    const end = Math.max(s, e);
+                    const a = sub.slice(0, start);
+                    const b = sub.slice(start, end);
+                    const c = sub.slice(end);
+                    return (
+                      <>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+                          {a}
+                        </span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+                          {b}
+                        </span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+                          {c}
+                        </span>
+                      </>
+                    );
+                  })()}
+                </h1>
 
-            <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all duration-1000 delay-700 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-            }`}>
-              {heroText.description}
-            </p>
+                <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all duration-1000 delay-700 ${
+                  heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                }`}>
+                  {heroText.description}
+                </p>
 
-            <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-900 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-            }`}>
-              <a
-                href="/projects"
-                className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105"
-              >
-                <span className="relative z-10">Ver proyectos</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </a>
-              <a
-                href="/contact"
-                className="px-8 py-4 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-medium text-lg hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 hover:scale-105"
-              >
-                Hablemos
-              </a>
-            </div>
+                <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-900 ${
+                  heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                }`}>
+                  <a
+                    href="/projects"
+                    className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                  >
+                    <span className="relative z-10">Ver proyectos</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </a>
+                  <a
+                    href="/contact"
+                    className="px-8 py-4 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-medium text-lg hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 hover:scale-105"
+                  >
+                    Hablemos
+                  </a>
+                </div>
+              </>
+            ) : (
+              <div className={`flex items-center justify-center min-h-[60vh] transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                <div className="text-center space-y-4">
+                  <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+                  <p className="text-gray-600 dark:text-gray-400">Cargando contenido...</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
