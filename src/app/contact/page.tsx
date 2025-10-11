@@ -379,62 +379,6 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-32 bg-gray-50 dark:bg-gray-950">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Preguntas frecuentes
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Respuestas a las preguntas más comunes sobre mi proceso de trabajo
-            </p>
-          </div>
-
-          <div className="space-y-8">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                ¿Cuál es tu proceso de desarrollo?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Trabajo en fases: planificación y análisis, diseño de arquitectura, desarrollo ágil con entregas periódicas,
-                testing exhaustivo y despliegue optimizado. Mantengo comunicación constante durante todo el proceso.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                ¿Qué tecnologías utilizas principalmente?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Me especializo en el ecosistema moderno: React/Next.js para frontend, Node.js/Python para backend,
-                integración de IA con OpenAI y TensorFlow, y bases de datos como PostgreSQL y MongoDB.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                ¿Ofreces mantenimiento post-lanzamiento?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Sí, ofrezco paquetes de mantenimiento que incluyen actualizaciones de seguridad,
-                optimizaciones de rendimiento, nuevas funcionalidades y soporte técnico continuo.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                ¿Trabajas con proyectos internacionales?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Absolutamente. Tengo experiencia trabajando con clientes de Europa, América y Asia.
-                El trabajo remoto me permite colaborar eficientemente sin importar la ubicación geográfica.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Social Links */}
       <section className="py-32 bg-white dark:bg-black">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -447,7 +391,7 @@ export default function Contact() {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <a
-              href="https://github.com/rebeca"
+              href="https://github.com/Pro-gra-mer"
               className="group flex items-center justify-center px-8 py-4 bg-gray-900 dark:bg-gray-800 text-white rounded-2xl font-medium hover:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105"
             >
               <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
@@ -457,7 +401,7 @@ export default function Contact() {
             </a>
 
             <a
-              href="https://linkedin.com/in/rebeca"
+              href="https://www.linkedin.com/in/rebeca-p%C3%A9rez-2a26772b7/"
               className="group flex items-center justify-center px-8 py-4 bg-blue-600 text-white rounded-2xl font-medium hover:bg-blue-700 transition-all duration-300 hover:scale-105"
             >
               <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
@@ -467,7 +411,7 @@ export default function Contact() {
             </a>
 
             <a
-              href="https://twitter.com/rebeca"
+              href="https://x.com/RebecaP50440899"
               className="group flex items-center justify-center px-8 py-4 bg-sky-500 text-white rounded-2xl font-medium hover:bg-sky-600 transition-all duration-300 hover:scale-105"
             >
               <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
