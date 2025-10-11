@@ -1,0 +1,75 @@
+"use client";
+
+import { useEffect, useRef, useState } from 'react';
+import { useScrollAnimation } from '@/components/useScrollAnimation';
+export default function HeroSection() {
+  const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
+  const [isLoading, setIsLoading] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [heroText, setHeroText] = useState<{ h1: string; subtitle: string; description: string; gradientStart: number; gradientEnd: number; }>({ h1: '', subtitle: '', description: '', gradientStart: 0, gradientEnd: 0 });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+{{ ... }}
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => { let cancelled = false; (async () => { try { const res = await fetch('/api/public/config/hero-text', { cache: 'no-store' }); if (!res.ok) return; const data = await res.json(); if (cancelled) return; setHeroText({ h1: String(data?.h1 || 'Desarrolladora Web Fullstack'), subtitle: String(data?.subtitle || 'Creando el futuro con IA y código'), description: String(data?.description || 'Transformo ideas en experiencias digitales excepcionales, combinando desarrollo web avanzado con inteligencia artificial.'), gradientStart: Number(data?.gradientStart || 0), gradientEnd: Number(data?.gradientEnd || 0), }); } catch { // ignore } finally { if (!cancelled) setIsLoading(false); } })(); return () => { cancelled = true; }; }, []);
+
+  useEffect(() => {
+    // Fuerza recarga del video cuando cambia la URL
+    if (videoRef.current) {
+      try { videoRef.current.load(); } catch {}
+{{ ... }}
+            <span className="text-sm font-semibold tracking-wider text-gray-600 dark:text-gray-400 uppercase">
+              {heroText.h1 || 'Desarrolladora Web Fullstack'}
+            </span>
+          </div>
+
+          <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight transition-opacity duration-500 delay-100 ${isLoading ? 'opacity-0' : 'opacity-100' }`>{(() => { const sub = heroText.subtitle; const len = sub.length; const s = Math.max(0, Math.min(Number(heroText.gradientStart), len)); const e = Math.max(0, Math.min(Number(heroText.gradientEnd), len)); const start = Math.min(s, e); const end = Math.max(s, e); const a = sub.slice(0, start); const b = sub.slice(start, end); const c = sub.slice(end); return ( <> <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+                    {a}
+                  </span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+{{ ... }}
+                </>
+              );
+            })()}
+          </h1>
+
+          <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-opacity duration-500 delay-200 ${isLoading ? 'opacity-0' : 'opacity-100' }`}>{heroText.description}</p>
+          </p>
+
+          <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-opacity duration-500 delay-300 ${isLoading ? 'opacity-0' : 'opacity-100' }`}>
+          }`}>
+            <a
+              href="/projects"
+              className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105"
+            >
+{{ ... }}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </a>
+            <a
+              href="/contact"
+              className="px-8 py-4 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-medium text-lg hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 hover:scale-105"
+            >
+              Hablemos
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <svg className="w-6 h-6 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </div>
+    </section>
+    </>
+  );
+}
