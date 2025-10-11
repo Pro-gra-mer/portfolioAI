@@ -8,6 +8,13 @@ export default function HeroSection() {
   const [heroVideoUrl, setHeroVideoUrl] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [heroText, setHeroText] = useState<{
+    h1: string;
+    subtitle: string;
+    description: string;
+    gradientStart: number;
+    gradientEnd: number;
+  }>({ h1: '', subtitle: '', description: '', gradientStart: 0, gradientEnd: 0 });
 
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +39,28 @@ export default function HeroSection() {
             setHeroVideoUrl(cacheBusted);
           }, 8000);
         }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/public/config/hero-text', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setHeroText({
+          h1: String(data?.h1 || ''),
+          subtitle: String(data?.subtitle || ''),
+          description: String(data?.description || ''),
+          gradientStart: Number(data?.gradientStart || 0),
+          gradientEnd: Number(data?.gradientEnd || 0),
+        });
       } catch {
         // ignore
       }
@@ -135,27 +164,43 @@ export default function HeroSection() {
             heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
           }`}>
             <span className="text-sm font-semibold tracking-wider text-gray-600 dark:text-gray-400 uppercase">
-              Desarrolladora Web Fullstack
+              {heroText.h1 || 'Desarrolladora Web Fullstack'}
             </span>
           </div>
 
           <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight transition-all duration-1000 delay-500 ${
             heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
           }`}>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
-              Creando el futuro
-            </span>
-            <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-              con IA y código
-            </span>
+            {(() => {
+              const sub = heroText.subtitle || 'Creando el futuro con IA y código';
+              const len = sub.length;
+              const s = Math.max(0, Math.min(Number(heroText.gradientStart || 0), len));
+              const e = Math.max(0, Math.min(Number(heroText.gradientEnd || 0), len));
+              const start = Math.min(s, e);
+              const end = Math.max(s, e);
+              const a = sub.slice(0, start);
+              const b = sub.slice(start, end);
+              const c = sub.slice(end);
+              return (
+                <>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+                    {a}
+                  </span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+                    {b}
+                  </span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+                    {c}
+                  </span>
+                </>
+              );
+            })()}
           </h1>
 
           <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all duration-1000 delay-700 ${
             heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
           }`}>
-            Transformo ideas en experiencias digitales excepcionales,
-            combinando desarrollo web avanzado con inteligencia artificial.
+            {heroText.description || 'Transformo ideas en experiencias digitales excepcionales, combinando desarrollo web avanzado con inteligencia artificial.'}
           </p>
 
           <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-900 ${

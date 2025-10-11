@@ -79,6 +79,7 @@ export default function Header() {
               <div className="flex items-center space-x-2">
                 <Link
                   href="/dashboard"
+                  onClick={() => setIsMenuOpen(false)}
                   className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +87,10 @@ export default function Header() {
                   </svg>
                 </Link>
                 <button
-                  onClick={handleSignOut}
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMenuOpen(false);
+                  }}
                   className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,6 +101,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/auth/signin"
+                onClick={() => setIsMenuOpen(false)}
                 className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,16 +125,16 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
             <div className="space-y-4">
-              <Link href="/" className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
                 Inicio
               </Link>
-              <Link href="/about" className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
+              <Link href="/about" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
                 Sobre Mí
               </Link>
-              <Link href="/projects" className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
+              <Link href="/projects" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
                 Proyectos
               </Link>
-              <Link href="/contact" className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
+              <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200">
                 Contacto
               </Link>
             </div>

@@ -636,19 +636,61 @@ Fuera del código, disfruto de la lectura, el deporte y la videografía, activid
                       </div>
                     )}
 
-                    <div className="flex items-center space-x-4">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) uploadImage(file, 'profileImage');
-                        }}
-                        className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
-                        disabled={imageUploading}
-                      />
-                      {imageUploading && (
-                        <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) uploadImage(file, 'profileImage');
+                          }}
+                          className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
+                          disabled={imageUploading}
+                        />
+                        {imageUploading && (
+                          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        )}
+                      </div>
+
+                      {content.images.profileImage && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (confirm('¿Eliminar la imagen de perfil?')) {
+                              const updatedContent = {
+                                ...content,
+                                images: { ...content.images, profileImage: undefined }
+                              };
+                              setContent(updatedContent);
+                              setMessage('Imagen de perfil eliminada');
+
+                              // Guardar automáticamente con el contenido actualizado
+                              try {
+                                const response = await fetch('/api/about', {
+                                  method: 'PUT',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ content: updatedContent }),
+                                });
+
+                                if (response.ok) {
+                                  setMessage('Imagen de perfil eliminada y cambios guardados');
+                                } else {
+                                  const data = await response.json();
+                                  setError(data.error || 'Error guardando cambios');
+                                }
+                              } catch (error) {
+                                setError('Error guardando cambios');
+                              }
+                            }
+                          }}
+                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm font-medium"
+                          disabled={imageUploading}
+                        >
+                          Eliminar
+                        </button>
                       )}
                     </div>
                   </div>
@@ -669,19 +711,61 @@ Fuera del código, disfruto de la lectura, el deporte y la videografía, activid
                       </div>
                     )}
 
-                    <div className="flex items-center space-x-4">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) uploadImage(file, 'heroImage');
-                        }}
-                        className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
-                        disabled={imageUploading}
-                      />
-                      {imageUploading && (
-                        <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) uploadImage(file, 'heroImage');
+                          }}
+                          className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
+                          disabled={imageUploading}
+                        />
+                        {imageUploading && (
+                          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        )}
+                      </div>
+
+                      {content.images.heroImage && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (confirm('¿Eliminar la imagen del hero?')) {
+                              const updatedContent = {
+                                ...content,
+                                images: { ...content.images, heroImage: undefined }
+                              };
+                              setContent(updatedContent);
+                              setMessage('Imagen del hero eliminada');
+
+                              // Guardar automáticamente con el contenido actualizado
+                              try {
+                                const response = await fetch('/api/about', {
+                                  method: 'PUT',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ content: updatedContent }),
+                                });
+
+                                if (response.ok) {
+                                  setMessage('Imagen del hero eliminada y cambios guardados');
+                                } else {
+                                  const data = await response.json();
+                                  setError(data.error || 'Error guardando cambios');
+                                }
+                              } catch (error) {
+                                setError('Error guardando cambios');
+                              }
+                            }
+                          }}
+                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm font-medium"
+                          disabled={imageUploading}
+                        >
+                          Eliminar
+                        </button>
                       )}
                     </div>
                   </div>

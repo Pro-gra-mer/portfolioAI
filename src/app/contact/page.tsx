@@ -192,7 +192,32 @@ export default function Contact() {
                 </div>
               </div>
 
-              
+              {/* Why Work With Me Section */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Por qué trabajar conmigo</h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
+                      Trabajar conmigo significa contar con un profesional confiable, proactivo y orientado a resultados.                    
+                    </p>
+                    <ul className="space-y-4 text-gray-600 dark:text-gray-400">
+                      <li className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <span><strong>Autonomía y responsabilidad:</strong> Capaz de gestionar proyectos de forma independiente, tomando decisiones acertadas sin necesidad de supervisión constante.</span>
+                      </li>
+                      <li className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <span><strong>Resolución de problemas:</strong> Enfrento desafíos técnicos y creativos con eficacia, encontrando soluciones prácticas y escalables.</span>
+                      </li>
+                      <li className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-pink-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <span><strong>Compromiso y enfoque en resultados:</strong> Me concentro en entregar trabajo de calidad, asegurando que cada proyecto cumpla sus objetivos.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Contact Form */}

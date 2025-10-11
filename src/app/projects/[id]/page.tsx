@@ -57,7 +57,7 @@ export default async function ProjectDetail({ params }: { params: { id: string }
 
         {/* Project Image - responsive size, better positioned */}
         {imageUrl && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-32 h-20 sm:w-40 sm:h-28 rounded-md sm:rounded-lg overflow-hidden shadow-md sm:shadow-lg border border-white/20 bg-white/10 backdrop-blur-sm">
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-48 h-32 sm:w-64 sm:h-44 lg:w-80 lg:h-52 rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-xl border border-white/20 bg-white/10 backdrop-blur-sm">
             <img
               src={imageUrl}
               alt={`Imagen de ${project.title}`}

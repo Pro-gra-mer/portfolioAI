@@ -142,6 +142,24 @@ export default function About() {
               </span>
             </div>
 
+            {/* Hero Image - Modern Floating Design */}
+            {content.images.heroImage && (
+              <div className={`relative transition-all duration-1000 delay-400 ${
+                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+              }`}>
+                <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-xl animate-pulse"></div>
+                <div className="relative inline-block">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full blur-lg opacity-20 animate-pulse"></div>
+                  <img
+                    src={content.images.heroImage}
+                    alt="Imagen representativa"
+                    className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-2xl ring-4 ring-white/50 dark:ring-gray-900/50 hover:ring-white dark:hover:ring-gray-800 transition-all duration-500 hover:scale-110"
+                    loading="eager"
+                  />
+                </div>
+              </div>
+            )}
+
             <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight transition-all duration-1000 delay-500 ${
               heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
             }`}>
@@ -171,10 +189,10 @@ export default function About() {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
               <a
-                href="#contacto"
+                href="/contact"
                 className="px-8 py-4 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-medium text-lg hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 hover:scale-105"
               >
-                Conectar
+                Contactar
               </a>
             </div>
           </div>
