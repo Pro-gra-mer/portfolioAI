@@ -82,7 +82,7 @@ export default function FeaturedProjectSection() {
             Proyecto destacado
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Una muestra del nivel de innovación y excelencia técnica que aporto a cada proyecto
+            Una muestra de lo que puedo aportar en cada proyecto.
           </p>
         </div>
 
