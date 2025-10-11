@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { authOptions } from '../../auth/[...nextauth]/route.js';
+import { authOptions } from '@/lib/auth';
 
 // Lista de páginas legales válidas
 const validPages = [
@@ -17,10 +15,10 @@ const prisma = new PrismaClient();
 // GET /api/legal/[slug] - Obtener contenido de página legal
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
     // Validar que el slug sea válido
     if (!validPages.includes(slug)) {
@@ -54,10 +52,10 @@ export async function GET(
 // PUT /api/legal/[slug] - Actualizar contenido de página legal
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
     // Validar que el slug sea válido
     if (!validPages.includes(slug)) {

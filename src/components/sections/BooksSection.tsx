@@ -1,6 +1,8 @@
 "use client";
 
 import { useScrollAnimation } from '@/components/useScrollAnimation';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface Book {
   title: string;
@@ -80,16 +82,16 @@ export default function BooksSection() {
             >
               {/* Book Cover */}
               <div className="relative mb-6">
-                <div className="aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl overflow-hidden shadow-xl">
-                  <img
+                <div className="aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl overflow-hidden shadow-xl relative">
+                  <Image
                     src={book.imageUrl}
                     alt={book.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    unoptimized
                     onError={(e) => {
-                      // Fallback gradient if image fails to load
-                      const target = e.currentTarget;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
+                      const parent = (e.target as HTMLElement).parentElement as HTMLElement | null;
                       if (parent) {
                         parent.style.background = 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%)';
                       }
@@ -154,7 +156,7 @@ export default function BooksSection() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             ¿Quieres conocer más sobre mi experiencia y conocimientos?
           </p>
-          <a
+          <Link
             href="/about"
             className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 dark:from-white dark:to-gray-100 dark:hover:from-gray-100 dark:hover:to-gray-200 text-white dark:text-gray-900 font-medium rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
           >
@@ -162,7 +164,7 @@ export default function BooksSection() {
             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

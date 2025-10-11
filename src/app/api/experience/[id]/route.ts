@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import type { Session } from 'next-auth';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { authOptions } from '../../auth/[...nextauth]/route.js';
+import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -11,9 +9,10 @@ const prisma = new PrismaClient();
 // PUT /api/experience/[id] - Actualizar experiencia laboral específica
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = (await getServerSession(authOptions as any)) as unknown;
     const userId = (session as any)?.user?.id as string | undefined;
 
@@ -38,7 +37,7 @@ export async function PUT(
     // Verificar que la experiencia pertenece al usuario
     const existingExperience = await prisma.experience.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: userId,
       },
     });
@@ -51,7 +50,7 @@ export async function PUT(
     }
 
     const updatedExperience = await prisma.experience.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         position,
         company,
@@ -77,9 +76,10 @@ export async function PUT(
 // DELETE /api/experience/[id] - Eliminar experiencia laboral específica
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = (await getServerSession(authOptions as any)) as unknown;
     const userId = (session as any)?.user?.id as string | undefined;
 
@@ -93,7 +93,7 @@ export async function DELETE(
     // Verificar que la experiencia pertenece al usuario
     const existingExperience = await prisma.experience.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: userId,
       },
     });
@@ -106,7 +106,7 @@ export async function DELETE(
     }
 
     await prisma.experience.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({

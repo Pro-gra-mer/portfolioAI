@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { authOptions } from '../../auth/[...nextauth]/route.js';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 

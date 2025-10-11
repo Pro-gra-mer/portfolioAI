@@ -6,11 +6,12 @@ const prisma = new PrismaClient();
 // GET /api/public/projects/[id] - Proyecto público por id (sin auth)
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const project = await prisma.project.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!project) {

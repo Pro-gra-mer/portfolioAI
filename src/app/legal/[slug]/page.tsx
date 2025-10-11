@@ -1,11 +1,12 @@
 import ReactMarkdown from 'react-markdown';
 import { notFound } from 'next/navigation';
 import { PrismaClient } from '@prisma/client';
+import Link from 'next/link';
 
 interface LegalPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Lista de páginas legales válidas
@@ -46,7 +47,7 @@ async function getLegalContent(slug: string): Promise<string | null> {
 
 // Metadata para SEO
 export async function generateMetadata({ params }: LegalPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const titles: Record<string, string> = {
     'aviso-legal': 'Aviso Legal - Rebeca Pérez',
@@ -68,7 +69,7 @@ export async function generateMetadata({ params }: LegalPageProps) {
 }
 
 export default async function LegalPage({ params }: LegalPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const content = await getLegalContent(slug);
 
   if (!content) {
@@ -90,12 +91,12 @@ export default async function LegalPage({ params }: LegalPageProps) {
           <div className="container mx-auto px-4 py-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
-                <a
+                <Link
                   href="/"
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   ← Volver al inicio
-                </a>
+                </Link>
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                     Información Legal
@@ -116,7 +117,7 @@ export default async function LegalPage({ params }: LegalPageProps) {
             <nav className="mb-8">
               <div className="flex flex-wrap gap-4">
                 {validPages.map((page) => (
-                  <a
+                  <Link
                     key={page}
                     href={`/legal/${page}`}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -128,7 +129,7 @@ export default async function LegalPage({ params }: LegalPageProps) {
                     {page === 'aviso-legal' && 'Aviso Legal'}
                     {page === 'politica-privacidad' && 'Política de Privacidad'}
                     {page === 'politica-cookies' && 'Política de Cookies'}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </nav>

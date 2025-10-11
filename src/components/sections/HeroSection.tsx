@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useScrollAnimation } from '@/components/useScrollAnimation';
+import Link from 'next/link';
 
 export default function HeroSection() {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
@@ -217,19 +218,19 @@ export default function HeroSection() {
                 <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-900 ${
                   heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
                 }`}>
-                  <a
+                  <Link
                     href="/projects"
                     className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105"
                   >
                     <span className="relative z-10">Ver proyectos</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/contact"
                     className="px-8 py-4 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-medium text-lg hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 hover:scale-105"
                   >
                     Hablemos
-                  </a>
+                  </Link>
                 </div>
               </>
             ) : (

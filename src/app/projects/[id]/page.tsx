@@ -2,6 +2,7 @@
 import Link from "next/link";
 import prisma from "../../../../lib/prisma";
 import ProjectVideoEmbed from "@/components/ProjectVideoEmbed";
+import Image from "next/image";
 
 function parseMaybeJson<T>(val: any, fallback: T): T {
   if (val == null) return fallback;
@@ -11,8 +12,8 @@ function parseMaybeJson<T>(val: any, fallback: T): T {
   return val as T;
 }
 
-export default async function ProjectDetail({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   const project = await prisma.project.findUnique({ where: { id } });
 
@@ -57,12 +58,15 @@ export default async function ProjectDetail({ params }: { params: { id: string }
 
         {/* Project Image - responsive size, better positioned */}
         {imageUrl && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-48 h-32 sm:w-64 sm:h-44 lg:w-80 lg:h-52 rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-xl border border-white/20 bg-white/10 backdrop-blur-sm">
-            <img
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-48 h-32 sm:w-64 sm:h-44 lg:w-80 lg:h-52 rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-xl border border-white/20 bg-white/10 backdrop-blur-sm relative">
+            <Image
               src={imageUrl}
               alt={`Imagen de ${project.title}`}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-              loading="eager"
+              fill
+              sizes="(max-width: 640px) 12rem, (max-width: 1024px) 16rem, 20rem"
+              className="object-cover hover:scale-105 transition-transform duration-300"
+              priority
+              unoptimized
             />
           </div>
         )}

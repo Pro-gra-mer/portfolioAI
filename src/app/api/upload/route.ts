@@ -4,9 +4,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 // @ts-ignore - types provided by package or ignored at build
 import { v2 as cloudinary } from 'cloudinary';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { authOptions } from '../auth/[...nextauth]/route.js';
+import { authOptions } from '@/lib/auth';
 
 // POST /api/upload - Subir imágenes de forma moderna
 export async function POST(request: NextRequest) {

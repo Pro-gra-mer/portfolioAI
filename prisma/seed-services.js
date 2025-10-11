@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
@@ -19,6 +19,7 @@ async function seedServices() {
       {
         title: 'Desarrollo Fullstack',
         description: 'Arquitecturas escalables y modernas con las últimas tecnologías del ecosistema JavaScript y Python.',
+        bullets: [],
         theme: 'purple',
         order: 1,
         active: true,
@@ -44,8 +45,22 @@ async function seedServices() {
     for (const service of services) {
       await prisma.serviceCard.upsert({
         where: { title: service.title },
-        update: service,
-        create: service,
+        update: {
+          title: service.title,
+          description: service.description,
+          bullets: service.bullets ?? [],
+          theme: service.theme,
+          order: service.order,
+          active: service.active,
+        },
+        create: {
+          title: service.title,
+          description: service.description,
+          bullets: service.bullets ?? [],
+          theme: service.theme,
+          order: service.order,
+          active: service.active,
+        },
       });
     }
 

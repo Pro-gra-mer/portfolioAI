@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
 
 const errorMessages = {
@@ -19,12 +20,13 @@ const errorMessages = {
   SessionRequired: 'Debes iniciar sesión para acceder a esta página.',
 };
 
-export default function AuthError() {
+function AuthErrorInner() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
 
-  const getErrorMessage = (error) => {
-    return errorMessages[error] || errorMessages.Default;
+  const getErrorMessage = (error: string | null) => {
+    if (!error) return errorMessages.Default;
+    return (errorMessages as Record<string, string>)[error] || errorMessages.Default;
   };
 
   return (
@@ -62,7 +64,7 @@ export default function AuthError() {
 
             <Link
               href="/"
-              className="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-4 px-8 rounded-xl transition-all duration-300 text-center block"
+              className="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-4 px-8 rounded-xl transition-all duración-300 text-center block"
             >
               Volver al inicio
             </Link>
@@ -84,5 +86,19 @@ export default function AuthError() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthError() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+        </div>
+      }
+    >
+      <AuthErrorInner />
+    </Suspense>
   );
 }

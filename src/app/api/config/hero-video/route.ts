@@ -3,9 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 // @ts-ignore
 import { v2 as cloudinary } from 'cloudinary';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { authOptions } from '../../auth/[...nextauth]/route.js';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 const URL_KEY = 'heroVideoUrl';

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useScrollAnimation } from '@/components/useScrollAnimation';
+import Image from 'next/image';
 
 export default function FeaturedProjectSection() {
   const { ref: featuredRef, isVisible: featuredVisible } = useScrollAnimation(0.1);
@@ -94,10 +95,13 @@ export default function FeaturedProjectSection() {
               <div className={`aspect-video ${featuredProject.bgColor} rounded-3xl relative overflow-hidden shadow-2xl group-hover:scale-105 transition-transform duration-500`}>
                 {featuredProject.imageUrl ? (
                   <>
-                    <img
+                    <Image
                       src={featuredProject.imageUrl}
                       alt={featuredProject.title}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      sizes="100vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
                     <div className="absolute bottom-4 left-4 right-4">
