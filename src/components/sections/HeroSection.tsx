@@ -1,9 +1,61 @@
 "use client";
 
+import { useEffect, useRef, useState } from 'react';
 import { useScrollAnimation } from '@/components/useScrollAnimation';
 
 export default function HeroSection() {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
+  const [heroVideoUrl, setHeroVideoUrl] = useState<string>('');
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/public/config/hero-video', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        // Preferir la URL directa primero (suele estar disponible antes que el derivado)
+        const direct = (data?.url || '') as string;
+        const derived = (data?.playbackUrl || '') as string;
+        const chosen = direct || derived;
+        if (!cancelled && chosen) {
+          const cacheBusted = `${chosen}${chosen.includes('?') ? '&' : '?'}v=${encodeURIComponent(data?.publicId || Date.now())}`;
+          setHeroVideoUrl(cacheBusted);
+        }
+        // Reintento: tras 8s vuelve a intentar con playbackUrl (por si el derivado ya está listo)
+        if (derived && !cancelled) {
+          setTimeout(() => {
+            if (cancelled) return;
+            const cacheBusted = `${derived}${derived.includes('?') ? '&' : '?'}v=${encodeURIComponent(data?.publicId || Date.now())}`;
+            setHeroVideoUrl(cacheBusted);
+          }, 8000);
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    // Fuerza recarga del video cuando cambia la URL
+    if (videoRef.current) {
+      try { videoRef.current.load(); } catch {}
+    }
+  }, [heroVideoUrl]);
+
+  useEffect(() => {
+    // Sincroniza el estado de mute con el elemento de video
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+      if (!isMuted) {
+        // Reproducir al activar el sonido (requiere interacción previa del usuario)
+        try { videoRef.current.play(); } catch {}
+      }
+    }
+  }, [isMuted]);
 
   return (
     <>
@@ -28,22 +80,49 @@ export default function HeroSection() {
       {/* Background: Left BG, Right Video - Gradient Fusion */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900">
         {/* Video with Horizontal Gradient Mask - Right Visible, Left Invisible */}
-        <video
-          autoPlay
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-          style={{
-            maskImage: `linear-gradient(to right, transparent 0%, transparent 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)`,
-            WebkitMaskImage: `linear-gradient(to right, transparent 0%, transparent 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)`
-          }}
-          onError={(e) => {
-            console.log('Video not found, hiding video');
-            e.currentTarget.style.display = 'none';
-          }}
-        >
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
+        {heroVideoUrl && (
+          <>
+            <video
+              key={heroVideoUrl}
+              ref={videoRef}
+              autoPlay
+              muted={isMuted}
+              loop
+              playsInline
+              preload="auto"
+              className="absolute inset-0 w-full h-full object-cover opacity-20"
+              style={{
+                maskImage: `linear-gradient(to right, transparent 0%, transparent 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)`,
+                WebkitMaskImage: `linear-gradient(to right, transparent 0%, transparent 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)`
+              }}
+              src={heroVideoUrl}
+            />
+
+            {/* Botón Mute/Unmute */}
+            <button
+              type="button"
+              onClick={() => setIsMuted((v) => !v)}
+              className="absolute z-20 bottom-6 right-6 px-3 py-2 rounded-full bg-black/60 text-white backdrop-blur-sm hover:bg-black/70 transition-colors text-sm flex items-center gap-2"
+              aria-label={isMuted ? 'Activar sonido' : 'Silenciar video'}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                {isMuted ? (
+                  // Icono de volumen off
+                  <path fillRule="evenodd" d="M9.586 5.586A2 2 0 0111 5h.172a2 2 0 011.414.586l2.828 2.828A2 2 0 0116 9.828V14.17a2 2 0 01-.586 1.414l-2.828 2.828A2 2 0 0111.172 19H11a2 2 0 01-1.414-.586L6.757 15.586A2 2 0 016 14.172V9.828a2 2 0 01.586-1.414l2.828-2.828A2 2 0 019.586 5.586zM19.293 4.293a1 1 0 011.414 1.414L5.707 20.707a1 1 0 11-1.414-1.414L19.293 4.293z" clipRule="evenodd" />
+                ) : (
+                  // Icono de volumen on
+                  <path d="M14.5 5.5a1 1 0 011.707-.707l2 2a1 1 0 010 1.414l-2 2A1 1 0 0115.5 9V7a1 1 0 01-.293-.707zM4 9a1 1 0 011-1h2.586l2.121-2.121A2 2 0 0111.414 5H12a2 2 0 012 2v10a2 2 0 01-2 2h-.586a2 2 0 01-1.414-.586L7.586 16H5a1 1 0 01-1-1V9z" />
+                )}
+              </svg>
+              <span>{isMuted ? 'Sonido off' : 'Sonido on'}</span>
+            </button>
+          </>
+        )}
       </div>
       {/* Animated Gradient Orbs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-20 animate-blob"></div>

@@ -32,27 +32,69 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!type || !['profileImage', 'heroImage', 'projectImage'].includes(type)) {
+    if (!type || !['profileImage', 'heroImage', 'projectImage', 'heroVideo'].includes(type)) {
       return NextResponse.json(
-        { error: 'Tipo de imagen inválido' },
+        { error: 'Tipo de archivo inválido' },
         { status: 400 }
       );
     }
 
-    // Validar tipo de archivo
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json(
-        { error: 'Solo se permiten archivos de imagen' },
-        { status: 400 }
-      );
-    }
+    // Validaciones por tipo
+    if (type === 'heroVideo') {
+      if (!file.type.startsWith('video/')) {
+        return NextResponse.json(
+          { error: 'Solo se permiten archivos de video para heroVideo' },
+          { status: 400 }
+        );
+      }
+      // Máximo 100MB para video
+      if (file.size > 100 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: 'El archivo de video es demasiado grande (máximo 100MB)' },
+          { status: 400 }
+        );
+      }
 
-    // Validar tamaño (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'El archivo es demasiado grande (máximo 5MB)' },
-        { status: 400 }
-      );
+      // Subir video a Cloudinary
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const uploadResult = await new Promise<{ url: string; public_id: string }>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: `portfolio/hero/${userId}`,
+            resource_type: 'video',
+            eager: [{ format: 'mp4' }],
+            eager_async: true,
+          },
+          (error: any, result: any) => {
+            if (error || !result) return reject(error);
+            resolve({ url: result.secure_url as string, public_id: result.public_id as string });
+          }
+        );
+        stream.end(buffer);
+      });
+
+      return NextResponse.json({
+        message: 'Video subido a Cloudinary correctamente',
+        url: uploadResult.url,
+        publicId: uploadResult.public_id,
+        size: file.size,
+        type: file.type,
+      });
+    } else {
+      if (!file.type.startsWith('image/')) {
+        return NextResponse.json(
+          { error: 'Solo se permiten archivos de imagen' },
+          { status: 400 }
+        );
+      }
+      // Máximo 5MB para imagen
+      if (file.size > 5 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: 'El archivo es demasiado grande (máximo 5MB)' },
+          { status: 400 }
+        );
+      }
     }
 
     // Convertir archivo a buffer y guardar
@@ -99,11 +141,10 @@ export async function POST(request: NextRequest) {
     const publicUrl = `/uploads/${userId}/${filename}`;
     return NextResponse.json({ message: 'Imagen subida correctamente', url: publicUrl, filename, size: file.size, type: file.type });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error subiendo imagen:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    const message = (error && (error.message || error.error?.message)) || 'Error interno del servidor';
+    const status = (error && (error.http_code || error.status || 500)) || 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
