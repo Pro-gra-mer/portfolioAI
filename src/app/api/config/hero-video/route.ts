@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 // @ts-ignore
 import { v2 as cloudinary } from 'cloudinary';
 import { authOptions } from '@/lib/auth';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../../lib/prisma';
 const URL_KEY = 'heroVideoUrl';
 const ID_KEY = 'heroVideoPublicId';
 

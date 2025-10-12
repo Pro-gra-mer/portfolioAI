@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { useScrollAnimation } from '@/components/useScrollAnimation';
 import Link from 'next/link';
 
 export default function HeroSection() {
-  const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
+  const heroRef = useRef<HTMLElement>(null);
+  const [heroVisible, setHeroVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [heroVideoUrl, setHeroVideoUrl] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -17,9 +17,9 @@ export default function HeroSection() {
     gradientStart: number;
     gradientEnd: number;
   }>({
-    h1: '',
-    subtitle: '',
-    description: '',
+    h1: 'Desarrolladora Web Fullstack',
+    subtitle: 'Creando el futuro con IA',
+    description: 'Transformo ideas en experiencias digitales excepcionales, combinando desarrollo web avanzado con inteligencia artificial.',
     gradientStart: 0,
     gradientEnd: 0
   });
@@ -59,20 +59,30 @@ export default function HeroSection() {
     (async () => {
       try {
         const res = await fetch('/api/public/config/hero-text', { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (cancelled) return;
-        setHeroText({
-          h1: String(data?.h1 || ''),
-          subtitle: String(data?.subtitle || ''),
-          description: String(data?.description || ''),
-          gradientStart: Number(data?.gradientStart || 0),
-          gradientEnd: Number(data?.gradientEnd || 0),
-        });
+        if (res.ok) {
+          const data = await res.json();
+          console.log('📥 Datos del hero desde BD:', data);
+          if (!cancelled) {
+            setHeroText({
+              h1: String(data?.h1 || ''),
+              subtitle: String(data?.subtitle || ''),
+              description: String(data?.description || ''),
+              gradientStart: Number(data?.gradientStart || 0),
+              gradientEnd: Number(data?.gradientEnd || 0),
+            });
+            console.log('✅ Estado actualizado con datos de BD');
+          }
+        } else {
+          console.log('❌ Fetch falló, usando valores por defecto');
+        }
       } catch {
         // ignore
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+          // Trigger staggered animation after content loads
+          setTimeout(() => setHeroVisible(true), 100);
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -112,9 +122,7 @@ export default function HeroSection() {
       `}</style>
       <section
         ref={heroRef}
-        className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
-          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
+        className={"relative min-h-screen flex items-center justify-center overflow-hidden"}
       >
         {/* Background: Left BG, Right Video - Gradient Fusion */}
         <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900">
@@ -170,7 +178,7 @@ export default function HeroSection() {
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <div className="space-y-8">
-            {heroText.h1 && heroText.subtitle && heroText.description ? (
+            {!isLoading ? (
               <>
                 <div className={`inline-block transition-all duration-1000 delay-300 ${
                   heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
@@ -180,42 +188,36 @@ export default function HeroSection() {
                   </span>
                 </div>
 
-                <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight transition-all duration-1000 delay-500 ${
-                  heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-                }`}>
+                <h1 className={`text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight`}>
                   {(() => {
-                    const sub = heroText.subtitle;
-                    const len = sub.length;
-                    const s = Math.max(0, Math.min(Number(heroText.gradientStart), len));
-                    const e = Math.max(0, Math.min(Number(heroText.gradientEnd), len));
-                    const start = Math.min(s, e);
-                    const end = Math.max(s, e);
-                    const a = sub.slice(0, start);
-                    const b = sub.slice(start, end);
-                    const c = sub.slice(end);
+                    const words = heroText.subtitle.trim().split(' ');
+                    const first = words.slice(0, 2).join(' ');
+                    const rest = words.slice(2).join(' ');
                     return (
                       <>
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
-                          {a}
+                        <span className={`inline-block bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white transition-all duration-1000 delay-500 ${
+                          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                        }`}>
+                          {first}
                         </span>
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-                          {b}
-                        </span>
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
-                          {c}
+                        <br />
+                        <span className={`inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transition-all duration-1000 delay-700 ${
+                          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                        }`}>
+                          {rest}
                         </span>
                       </>
                     );
                   })()}
                 </h1>
 
-                <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all duration-1000 delay-700 ${
+                <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all duration-1000 delay-900 ${
                   heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
                 }`}>
                   {heroText.description}
                 </p>
 
-                <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-900 ${
+                <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-8 transition-all duration-1000 delay-1000 ${
                   heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
                 }`}>
                   <Link

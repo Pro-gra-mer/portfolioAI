@@ -112,7 +112,7 @@ export default function Settings() {
       } else {
         setError(data.error || 'Error actualizando email');
       }
-    } catch (error) {
+    } catch {
       setError('Error interno del servidor');
     } finally {
       setLoading(false);
@@ -167,7 +167,7 @@ export default function Settings() {
       } else {
         setError(data.error || 'Error actualizando contraseña');
       }
-    } catch (error) {
+    } catch {
       setError('Error interno del servidor');
     } finally {
       setLoading(false);

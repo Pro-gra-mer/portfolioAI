@@ -26,8 +26,8 @@ export default function HomeHeroVideoTab() {
       if (!res.ok) throw new Error(data.error || 'No se pudo cargar la configuración');
       setVideoUrl(data.url || '');
       setPublicId(data.publicId || '');
-    } catch (e: any) {
-      setError(e?.message || 'Error cargando configuración');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error cargando configuración');
     } finally {
       setLoading(false);
     }
@@ -67,8 +67,8 @@ export default function HomeHeroVideoTab() {
       setMessage('Video actualizado correctamente');
       setVideoUrl(upData.url);
       setPublicId(upData.publicId || '');
-    } catch (e: any) {
-      setError(e?.message || 'Error guardando video');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error guardando video');
     } finally {
       setSaving(false);
     }
@@ -88,8 +88,8 @@ export default function HomeHeroVideoTab() {
       setMessage('Video eliminado correctamente');
       setVideoUrl('');
       setPublicId('');
-    } catch (e: any) {
-      setError(e?.message || 'Error eliminando video');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error eliminando video');
     } finally {
       setSaving(false);
     }

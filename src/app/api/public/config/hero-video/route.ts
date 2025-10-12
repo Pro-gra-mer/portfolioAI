@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../../../lib/prisma';
 
 const URL_KEY = 'heroVideoUrl';
 const ID_KEY = 'heroVideoPublicId';

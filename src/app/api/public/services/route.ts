@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../../lib/prisma';
 
 // GET /api/public/services - Lista pública de servicios (sin auth)
 export async function GET() {

@@ -44,8 +44,8 @@ export default function HomeHeroTextTab() {
         gradientStart: Number(data.gradientStart || 0),
         gradientEnd: Number(data.gradientEnd || 0),
       });
-    } catch (e: any) {
-      setError(e?.message || 'Error cargando textos del hero');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error cargando textos del hero');
     } finally {
       setLoading(false);
     }
@@ -80,8 +80,8 @@ export default function HomeHeroTextTab() {
 
       setMessage('Textos del hero guardados');
       await loadCurrent();
-    } catch (e: any) {
-      setError(e?.message || 'Error guardando');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error guardando');
     } finally {
       setSaving(false);
     }

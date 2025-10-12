@@ -102,7 +102,7 @@ export default function HomeServicesTab() {
             .sort((a, b) => a.order - b.order)
         );
       }
-    } catch (e) {
+    } catch {
       setError('No se pudo cargar la lista de servicios');
       setServices(defaults);
     } finally {
@@ -139,8 +139,8 @@ export default function HomeServicesTab() {
 
       setMessage('Servicio guardado correctamente');
       await fetchServices();
-    } catch (e: any) {
-      setError(e?.message || 'Error guardando servicio');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error guardando servicio');
     } finally {
       setSavingId(null);
     }
@@ -164,8 +164,8 @@ export default function HomeServicesTab() {
 
       setMessage('Servicio eliminado correctamente');
       await fetchServices();
-    } catch (e: any) {
-      setError(e?.message || 'Error eliminando servicio');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error eliminando servicio');
     }
   };
 

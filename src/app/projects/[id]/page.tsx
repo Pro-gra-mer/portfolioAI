@@ -4,7 +4,7 @@ import prisma from "../../../../lib/prisma";
 import ProjectVideoEmbed from "@/components/ProjectVideoEmbed";
 import Image from "next/image";
 
-function parseMaybeJson<T>(val: any, fallback: T): T {
+function parseMaybeJson<T>(val: unknown, fallback: T): T {
   if (val == null) return fallback;
   if (typeof val === "string") {
     try { return JSON.parse(val) as T; } catch { return fallback; }
@@ -29,14 +29,13 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
     );
   }
 
-  const technologies = parseMaybeJson<string[]>(project.technologies as any, []);
-  const features = parseMaybeJson<string[]>(project.features as any, []);
-  const metrics = parseMaybeJson<Record<string, string>>(project.metrics as any, {});
+  const technologies = parseMaybeJson<string[]>(project.technologies as unknown, []);
+  const features = parseMaybeJson<string[]>(project.features as unknown, []);
+  const metrics = parseMaybeJson<Record<string, string | number>>(project.metrics as unknown, {});
 
   const gradient = project.bgColor || `bg-gradient-to-br ${project.gradient}`;
-  const textColor = project.textColor || "text-white";
-  const videoUrl = (project as any).videoUrl as string | undefined;
-  const imageUrl = (project as any).imageUrl as string | undefined;
+  const videoUrl = project.videoUrl ?? undefined;
+  const imageUrl = project.imageUrl ?? undefined;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">

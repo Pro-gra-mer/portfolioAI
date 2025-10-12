@@ -54,8 +54,8 @@ export const authOptions = {
   },
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: User | AdapterUser }) {
-      if (user && 'id' in user && typeof (user as any).id === 'string') {
-        (token as JWT & { id?: string }).id = (user as any).id as string;
+      if (user && typeof (user as { id?: unknown }).id === 'string') {
+        (token as JWT & { id?: string }).id = (user as { id?: string }).id!;
       }
       return token as JWT;
     },

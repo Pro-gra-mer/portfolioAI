@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -70,22 +70,13 @@ export default function ManageServices() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [services, setServices] = useState<ServiceForm[]>([]);
 
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session) {
-      router.push('/auth/signin');
-      return;
-    }
-    fetchServices();
-  }, [session, status, router]);
-
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -117,13 +108,22 @@ export default function ManageServices() {
             .sort((a, b) => a.order - b.order)
         );
       }
-    } catch (e) {
+    } catch {
       setError('No se pudo cargar la lista de servicios');
       setServices(defaults);
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
+    fetchServices();
+  }, [session, status, router, fetchServices]);
 
   const updateField = (index: number, patch: Partial<ServiceForm>) => {
     setServices((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));
@@ -154,8 +154,8 @@ export default function ManageServices() {
 
       setMessage('Servicio guardado correctamente');
       await fetchServices();
-    } catch (e: any) {
-      setError(e?.message || 'Error guardando servicio');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error guardando servicio');
     } finally {
       setSavingId(null);
     }
@@ -179,8 +179,8 @@ export default function ManageServices() {
 
       setMessage('Servicio eliminado correctamente');
       await fetchServices();
-    } catch (e: any) {
-      setError(e?.message || 'Error eliminando servicio');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error eliminando servicio');
     }
   };
 

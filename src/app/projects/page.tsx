@@ -2,13 +2,29 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useScrollAnimation } from '@/components/useScrollAnimation';
+import Image from 'next/image';
+
+type Metrics = Record<string, string | number>;
+interface Project {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  longDescription: string;
+  technologies: string[];
+  features: string[];
+  metrics: Metrics;
+  gradient?: string | null;
+  bgColor: string;
+  textColor: string;
+  imageUrl?: string | null;
+}
 
 export default function Projects() {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation(0.1);
   const { ref: projectsRef, isVisible: projectsVisible } = useScrollAnimation(0.1);
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation(0.1);
-  const [projects, setProjects] = useState<any[]>([]);
-  const [featuredProject, setFeaturedProject] = useState<any>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -16,46 +32,32 @@ export default function Projects() {
         const res = await fetch('/api/public/projects', { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
-        const list = (data?.projects || []).map((p: any) => {
-          const parse = (v: any, fb: any) => {
+        const list: Project[] = (data?.projects || []).map((p: Record<string, unknown>) => {
+          const parse = <T,>(v: unknown, fb: T): T => {
             if (v == null) return fb;
             if (typeof v === 'string') {
-              try { return JSON.parse(v); } catch { return fb; }
+              try { return JSON.parse(v) as T; } catch { return fb; }
             }
-            return v;
+            return v as T;
           };
+          const base = p as any;
           return {
-            ...p,
-            technologies: parse(p.technologies, []),
-            features: parse(p.features, []),
-            metrics: parse(p.metrics, {}),
-            longDescription: p.longDescription || p.description,
-            bgColor: p.bgColor || `bg-gradient-to-br ${p.gradient}`,
-            textColor: p.textColor || 'text-white',
+            ...(base as object),
+            id: String(base.id),
+            title: String(base.title),
+            category: String(base.category),
+            description: String(base.description),
+            longDescription: String(base.longDescription || base.description || ''),
+            technologies: parse<string[]>(base.technologies, []),
+            features: parse<string[]>(base.features, []),
+            metrics: parse<Metrics>(base.metrics, {}),
+            gradient: (base.gradient as string) ?? undefined,
+            bgColor: String(base.bgColor || `bg-gradient-to-br ${base.gradient || ''}`),
+            textColor: String(base.textColor || 'text-white'),
+            imageUrl: (base.imageUrl as string) ?? null,
           };
         });
         setProjects(list);
-
-        // Establecer proyecto destacado
-        if (data.featuredProject) {
-          const featured = data.featuredProject;
-          const parse = (v: any, fb: any) => {
-            if (v == null) return fb;
-            if (typeof v === 'string') {
-              try { return JSON.parse(v); } catch { return fb; }
-            }
-            return v;
-          };
-          setFeaturedProject({
-            ...featured,
-            technologies: parse(featured.technologies, []),
-            features: parse(featured.features, []),
-            metrics: parse(featured.metrics, {}),
-            longDescription: featured.longDescription || featured.description,
-            bgColor: featured.bgColor || `bg-gradient-to-br ${featured.gradient}`,
-            textColor: featured.textColor || 'text-white',
-          });
-        }
       } catch (e) {
         console.error(e);
       }
@@ -119,12 +121,12 @@ export default function Projects() {
                 <span className="relative z-10">Explorar proyectos</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
-              <a
+              <Link
                 href="/contact"
                 className="px-8 py-4 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-medium text-lg hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 hover:scale-105"
               >
                 Colaborar
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -166,12 +168,14 @@ export default function Projects() {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 {project.imageUrl ? (
-                  <div className="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
-                    <img
+                  <div className="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
+                    <Image
                       src={project.imageUrl}
                       alt={project.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                      unoptimized
                     />
                   </div>
                 ) : (
@@ -253,12 +257,12 @@ export default function Projects() {
             Cada proyecto es una oportunidad para crear algo extraordinario.
             Trabajemos juntos para convertir tu visión en realidad.
           </p>
-          <a
+          <Link
             href="/contact"
             className={`inline-block px-10 py-5 bg-white text-gray-900 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-2xl`}
           >
             Empezar proyecto
-          </a>
+          </Link>
         </div>
       </section>
     </div>

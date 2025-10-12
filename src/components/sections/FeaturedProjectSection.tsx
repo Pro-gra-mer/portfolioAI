@@ -5,9 +5,24 @@ import Link from 'next/link';
 import { useScrollAnimation } from '@/components/useScrollAnimation';
 import Image from 'next/image';
 
+type Metrics = Record<string, string | number>;
+interface FeaturedProject {
+  id: string;
+  title: string;
+  category: string;
+  longDescription: string;
+  gradient?: string | null;
+  bgColor: string;
+  textColor: string;
+  technologies: string[];
+  features: string[];
+  metrics: Metrics;
+  imageUrl?: string | null;
+}
+
 export default function FeaturedProjectSection() {
   const { ref: featuredRef, isVisible: featuredVisible } = useScrollAnimation(0.1);
-  const [featuredProject, setFeaturedProject] = useState<any>(null);
+  const [featuredProject, setFeaturedProject] = useState<FeaturedProject | null>(null);
 
   useEffect(() => {
     async function loadFeatured() {
@@ -17,12 +32,12 @@ export default function FeaturedProjectSection() {
           const data = await res.json();
           if (data.featuredProject) {
             const p = data.featuredProject;
-            const parse = (v: any, fb: any) => {
+            const parse = <T,>(v: unknown, fb: T): T => {
               if (v == null) return fb;
               if (typeof v === 'string') {
-                try { return JSON.parse(v); } catch { return fb; }
+                try { return JSON.parse(v) as T; } catch { return fb; }
               }
-              return v;
+              return v as T;
             };
             setFeaturedProject({
               ...p,

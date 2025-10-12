@@ -36,7 +36,7 @@ function toEmbedUrl(raw?: string): { url?: string; title?: string } {
         };
       }
     }
-  } catch (e) {
+  } catch {
     // ignore parsing errors
   }
   return {};

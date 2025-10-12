@@ -131,7 +131,7 @@ export default function ServicesSection() {
           const list: Service[] = (data?.services || []).slice(0, 4);
           if (list.length) setServices(list);
         }
-      } catch (e) {
+      } catch {
         // keep fallback
       }
     }

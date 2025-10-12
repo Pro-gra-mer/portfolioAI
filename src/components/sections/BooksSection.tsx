@@ -36,7 +36,7 @@ const books: Book[] = [
   {
     title: "React en 48h",
     subtitle: "Para principiantes",
-    description: "diseñado para que aprendas React de forma rápida y eficiente, utilizando analogías y ejemplos del mundo real que facilitan la comprensión de esta poderosa librería.",
+    description: "Diseñado para que aprendas React de forma rápida y eficiente, utilizando analogías y ejemplos del mundo real que facilitan la comprensión de esta poderosa librería.",
     amazonUrl: "https://www.amazon.es/dp/B0DCVLBZV6",
     imageUrl: "/images/books/react.jpg",
     price: "€8.68",
