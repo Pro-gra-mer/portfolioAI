@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "seed:services": "node prisma/seed-services.js",
+    "seed": "node prisma/seed.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

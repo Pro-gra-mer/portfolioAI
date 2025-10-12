@@ -18,6 +18,7 @@ type FormData = {
   longDescription: string;
   technologies: string[];
   tools: string[];
+  challenges: string[];
   gradient: string;
   textColor: string;
   bgColor: string;
@@ -45,6 +46,7 @@ export default function EditProjectPage() {
     longDescription: "",
     technologies: [""],
     tools: [""],
+    challenges: [""],
     gradient: "from-blue-500 to-purple-600",
     textColor: "text-white",
     bgColor: "bg-gradient-to-br from-blue-500 to-purple-600",
@@ -128,6 +130,7 @@ export default function EditProjectPage() {
 
         const technologies = parseMaybeJson(project.technologies, []);
         const tools = parseMaybeJson(project.tools, []);
+        const challenges = parseMaybeJson(project.challenges, []);
         const features = parseMaybeJson(project.features, []);
         const metricsObj = parseMaybeJson(project.metrics, {} as Record<string, string>);
         // Transformar objeto { modelo: porcentaje } a lista [{model, percent}]
@@ -143,6 +146,7 @@ export default function EditProjectPage() {
           longDescription: project.longDescription || project.description || "",
           technologies: Array.isArray(technologies) && technologies.length > 0 ? technologies : [""],
           tools: Array.isArray(tools) && tools.length > 0 ? tools : [""],
+          challenges: Array.isArray(challenges) && challenges.length > 0 ? challenges : [""],
           gradient: project.gradient || "from-blue-500 to-purple-600",
           textColor: project.textColor || "text-white",
           bgColor: project.bgColor || `bg-gradient-to-br ${project.gradient || "from-blue-500 to-purple-600"}`,
@@ -231,6 +235,22 @@ export default function EditProjectPage() {
     setFormData(prev => ({
       ...prev,
       tools: prev.tools.filter((_: string, i: number) => i !== index),
+    }));
+  };
+
+  const addChallenge = () => {
+    setFormData(prev => ({ ...prev, challenges: [...prev.challenges, ""] }));
+  };
+  const updateChallenge = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      challenges: prev.challenges.map((c, i) => (i === index ? value : c)),
+    }));
+  };
+  const removeChallenge = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      challenges: prev.challenges.filter((_, i) => i !== index),
     }));
   };
 
@@ -411,51 +431,7 @@ export default function EditProjectPage() {
                 </div>
               </div>
 
-              {/* Tecnologías Principales */}
-              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  Tecnologías Principales
-                </h3>
-                <div className="space-y-4">
-                  {formData.technologies.map((tech, index) => (
-                    <div key={index} className="flex items-center space-x-4">
-                      <input
-                        type="text"
-                        value={tech}
-                        onChange={(e) => updateTechnology(index, e.target.value)}
-                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        placeholder={`Tecnología principal ${index + 1}`}
-                      />
-                      {formData.technologies.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeTechnology(index)}
-                          className="p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                          aria-label="Eliminar tecnología"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addTechnology}
-                    className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Agregar tecnología principal</span>
-                  </button>
-                </div>
-              </div>
-
-              
-
-              {/* Apariencia */}
+              {/* Apariencia Visual */}
               <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Apariencia Visual</h3>
 
@@ -505,6 +481,48 @@ export default function EditProjectPage() {
                 </div>
               </div>
 
+              {/* Tecnologías Principales */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                  Tecnologías Principales
+                </h3>
+                <div className="space-y-4">
+                  {formData.technologies.map((tech, index) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <input
+                        type="text"
+                        value={tech}
+                        onChange={(e) => updateTechnology(index, e.target.value)}
+                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        placeholder={`Tecnología principal ${index + 1}`}
+                      />
+                      {formData.technologies.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeTechnology(index)}
+                          className="p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          aria-label="Eliminar tecnología"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addTechnology}
+                    className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Agregar tecnología principal</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Características */}
               <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Características Principales</h3>
@@ -542,6 +560,47 @@ export default function EditProjectPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                     </svg>
                     <span>Agregar característica</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Desafíos superados */}
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Desafíos superados</h3>
+
+                <div className="space-y-4">
+                  {formData.challenges.map((challenge: string, index: number) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <input
+                        type="text"
+                        value={challenge}
+                        onChange={(e) => updateChallenge(index, e.target.value)}
+                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        placeholder={`Desafío ${index + 1}`}
+                      />
+                      {formData.challenges.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeChallenge(index)}
+                          className="p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          aria-label="Eliminar desafío"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addChallenge}
+                    className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Agregar desafío</span>
                   </button>
                 </div>
               </div>

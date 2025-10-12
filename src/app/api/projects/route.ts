@@ -145,6 +145,7 @@ export async function POST(request: NextRequest) {
       imageUrl,
       imagePublicId,
       features,
+      challenges,
       tools,
       metrics,
     } = body;
@@ -172,6 +173,7 @@ export async function POST(request: NextRequest) {
         imageUrl: imageUrl || null,
         imagePublicId: imagePublicId || null,
         features: JSON.stringify(features || []),
+        challenges: JSON.stringify(challenges || []),
         tools: tools ? JSON.stringify(tools) : null,
         metrics: JSON.stringify(metrics || {}),
         userId: userId,

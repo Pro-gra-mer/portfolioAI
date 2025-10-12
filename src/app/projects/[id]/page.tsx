@@ -31,6 +31,8 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
 
   const technologies = parseMaybeJson<string[]>(project.technologies as unknown, []);
   const features = parseMaybeJson<string[]>(project.features as unknown, []);
+  const challenges = parseMaybeJson<string[]>((project as any).challenges as unknown, []);
+  const tools = parseMaybeJson<string[]>((project as any).tools as unknown, []);
   const metrics = parseMaybeJson<Record<string, string | number>>(project.metrics as unknown, {});
 
   const gradient = project.bgColor || `bg-gradient-to-br ${project.gradient}`;
@@ -97,6 +99,28 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
                 <ul className="space-y-2 list-disc pl-6 marker:text-gray-400 dark:marker:text-gray-500">
                   {features.map((f, i) => (
                     <li key={i} className="text-gray-700 dark:text-gray-300">{f}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {challenges.length > 0 && (
+              <div className="mt-10">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Desafíos superados</h3>
+                <ul className="space-y-2 list-disc pl-6 marker:text-gray-400 dark:marker:text-gray-500">
+                  {challenges.map((c, i) => (
+                    <li key={i} className="text-gray-700 dark:text-gray-300">{c}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {tools.length > 0 && (
+              <div className="mt-10">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Herramientas y Tecnologías utilizadas</h3>
+                <ul className="space-y-2 list-disc pl-6 marker:text-gray-400 dark:marker:text-gray-500">
+                  {tools.map((t, i) => (
+                    <li key={i} className="text-gray-700 dark:text-gray-300">{t}</li>
                   ))}
                 </ul>
               </div>
