@@ -52,7 +52,15 @@ export default function HomeHeroVideoTab() {
         method: 'POST',
         body: form,
       });
-      const upData = await up.json();
+      
+      let upData;
+      try {
+        upData = await up.json();
+      } catch (jsonError) {
+        console.error('Error parseando respuesta de /api/upload:', jsonError);
+        throw new Error('Error del servidor al subir el video. Verifica que Cloudinary esté configurado correctamente en Vercel.');
+      }
+      
       if (!up.ok) throw new Error(upData.error || 'No se pudo subir el video');
 
       // 2) Guardar en config

@@ -53,32 +53,55 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Verificar configuración de Cloudinary
+      if (!process.env.CLOUDINARY_URL) {
+        return NextResponse.json(
+          { error: 'Cloudinary no está configurado. Verifica CLOUDINARY_URL en las variables de entorno.' },
+          { status: 500 }
+        );
+      }
+
       // Subir video a Cloudinary
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const uploadResult = await new Promise<{ url: string; public_id: string }>((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: `portfolio/hero/${userId}`,
-            resource_type: 'video',
-            eager: [{ format: 'mp4' }],
-            eager_async: true,
-          },
-          (error: any, result: any) => {
-            if (error || !result) return reject(error);
-            resolve({ url: result.secure_url as string, public_id: result.public_id as string });
-          }
-        );
-        stream.end(buffer);
-      });
+      
+      try {
+        const uploadResult = await new Promise<{ url: string; public_id: string }>((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: `portfolio/hero/${userId}`,
+              resource_type: 'video',
+              eager: [{ format: 'mp4' }],
+              eager_async: true,
+            },
+            (error: any, result: any) => {
+              if (error) {
+                console.error('Error de Cloudinary:', error);
+                return reject(new Error(error.message || 'Error subiendo a Cloudinary'));
+              }
+              if (!result) {
+                return reject(new Error('Cloudinary no devolvió resultado'));
+              }
+              resolve({ url: result.secure_url as string, public_id: result.public_id as string });
+            }
+          );
+          stream.end(buffer);
+        });
 
-      return NextResponse.json({
-        message: 'Video subido a Cloudinary correctamente',
-        url: uploadResult.url,
-        publicId: uploadResult.public_id,
-        size: file.size,
-        type: file.type,
-      });
+        return NextResponse.json({
+          message: 'Video subido a Cloudinary correctamente',
+          url: uploadResult.url,
+          publicId: uploadResult.public_id,
+          size: file.size,
+          type: file.type,
+        });
+      } catch (cloudinaryError: any) {
+        console.error('Error subiendo video a Cloudinary:', cloudinaryError);
+        return NextResponse.json(
+          { error: `Error de Cloudinary: ${cloudinaryError.message || 'Error desconocido'}` },
+          { status: 500 }
+        );
+      }
     } else {
       if (!file.type.startsWith('image/')) {
         return NextResponse.json(
