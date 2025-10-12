@@ -40,35 +40,38 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Hero / Cover */}
-      <section className={`${gradient} text-white relative`}>
+      <section className={`${gradient} text-white relative overflow-hidden`}>
         <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-20">
-          <div className="max-w-4xl lg:max-w-5xl">
-            <div className="mb-3 sm:mb-4">
-              <Link href="/projects" className="inline-flex items-center text-white/90 hover:text-white transition text-sm sm:text-base">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                Volver a proyectos
-              </Link>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Texto del hero */}
+            <div className="max-w-2xl">
+              <div className="mb-3 sm:mb-4">
+                <Link href="/projects" className="inline-flex items-center text-white/90 hover:text-white transition text-sm sm:text-base">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                  Volver a proyectos
+                </Link>
+              </div>
+              <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-white/20 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">{project.category}</span>
+              <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">{project.title}</h1>
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/90">{project.description}</p>
             </div>
-            <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-white/20 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">{project.category}</span>
-            <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">{project.title}</h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/90 max-w-2xl sm:max-w-3xl">{project.description}</p>
+
+            {/* Project Image - a la derecha */}
+            {imageUrl && (
+              <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-xl overflow-hidden shadow-2xl border border-white/20 bg-white/10 backdrop-blur-sm">
+                <Image
+                  src={imageUrl}
+                  alt={`Imagen de ${project.title}`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover hover:scale-105 transition-transform duration-300"
+                  priority
+                  unoptimized
+                />
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Project Image - responsive size, better positioned */}
-        {imageUrl && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-48 h-32 sm:w-64 sm:h-44 lg:w-80 lg:h-52 rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-xl border border-white/20 bg-white/10 backdrop-blur-sm relative">
-            <Image
-              src={imageUrl}
-              alt={`Imagen de ${project.title}`}
-              fill
-              sizes="(max-width: 640px) 12rem, (max-width: 1024px) 16rem, 20rem"
-              className="object-cover hover:scale-105 transition-transform duration-300"
-              priority
-              unoptimized
-            />
-          </div>
-        )}
       </section>
 
       {/* Content */}
@@ -91,12 +94,9 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
             {features.length > 0 && (
               <div className="mt-10">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Características</h3>
-                <ul className="space-y-2">
+                <ul className="space-y-2 list-disc pl-6 marker:text-gray-400 dark:marker:text-gray-500">
                   {features.map((f, i) => (
-                    <li key={i} className="flex items-start text-gray-700 dark:text-gray-300">
-                      <span className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mt-2 mr-3" />
-                      <span>{f}</span>
-                    </li>
+                    <li key={i} className="text-gray-700 dark:text-gray-300">{f}</li>
                   ))}
                 </ul>
               </div>

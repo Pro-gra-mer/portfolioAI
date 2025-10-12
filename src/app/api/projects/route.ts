@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import type { Session } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../lib/prisma';
 
 // GET /api/projects - Obtener proyectos del usuario autenticado
 export async function GET() {
@@ -147,6 +145,7 @@ export async function POST(request: NextRequest) {
       imageUrl,
       imagePublicId,
       features,
+      tools,
       metrics,
     } = body;
 
@@ -173,6 +172,7 @@ export async function POST(request: NextRequest) {
         imageUrl: imageUrl || null,
         imagePublicId: imagePublicId || null,
         features: JSON.stringify(features || []),
+        tools: tools ? JSON.stringify(tools) : null,
         metrics: JSON.stringify(metrics || {}),
         userId: userId,
       } as any),

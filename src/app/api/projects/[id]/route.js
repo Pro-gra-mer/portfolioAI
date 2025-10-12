@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../lib/prisma';
 
 // DELETE /api/projects/[id] - Eliminar proyecto específico
 export async function DELETE(
@@ -99,6 +97,7 @@ export async function PUT(
       textColor,
       bgColor,
       features,
+      tools,
       metrics,
       isFeatured,
       imageUrl,
@@ -120,6 +119,7 @@ export async function PUT(
         ...(textColor && { textColor }),
         ...(bgColor && { bgColor }),
         ...(features && { features: JSON.stringify(features) }),
+        ...(tools && { tools: JSON.stringify(tools) }),
         ...(metrics && { metrics: JSON.stringify(metrics) }),
         ...(isFeatured !== undefined && { isFeatured }),
         ...(imageUrl !== undefined && { imageUrl }),
