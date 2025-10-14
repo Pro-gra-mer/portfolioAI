@@ -37,7 +37,7 @@ export default function Header() {
             {/* Auth Button */}
             {status === 'loading' ? (
               <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-            ) : session ? (
+            ) : session && (
               <div className="flex items-center space-x-4">
                 <Link
                   href="/dashboard"
@@ -58,16 +58,6 @@ export default function Header() {
                   <span className="group-hover:text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">Salir</span>
                 </button>
               </div>
-            ) : (
-              <Link
-                href="/auth/signin"
-                className="relative text-gray-700 dark:text-gray-300 hover:text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 font-medium transition-all duration-300 hover:scale-105 flex items-center"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-                Acceso
-              </Link>
             )}
           </div>
 
@@ -75,7 +65,7 @@ export default function Header() {
             {/* Mobile Auth Button */}
             {status === 'loading' ? (
               <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-            ) : session ? (
+            ) : session && (
               <div className="flex items-center space-x-2">
                 <Link
                   href="/dashboard"
@@ -98,16 +88,6 @@ export default function Header() {
                   </svg>
                 </button>
               </div>
-            ) : (
-              <Link
-                href="/auth/signin"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-              </Link>
             )}
 
             <button
