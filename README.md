@@ -7,7 +7,7 @@ Portfolio profesional desarrollado con Next.js (App Router) y Tailwind CSS. Incl
 - **Next.js 15 + App Router** con arquitectura modular y SSR/ISR donde aplica.
 - **Tailwind CSS** con diseño limpio, elegante, responsivo y modo oscuro/claro.
 - **Panel de administración** para gestionar Hero (video/texto), Servicios, Proyectos y Experiencia.
-- **Base de datos MySQL** mediante **Prisma ORM** (`schema.prisma`).
+- **Base de datos PostgreSQL** mediante **Prisma ORM** (`schema.prisma`).
 - **Autenticación** con **NextAuth Credentials** (email/contraseña).
 - **Contact form** con envío por **SMTP (Nodemailer)**.
 - **Assets en Cloudinary** y fallback local para algunos tipos.
@@ -56,13 +56,13 @@ portfolio/
 ## 🛠️ Tecnologías
 
 - Frontend: **Next.js 15**, **React 19**, **Tailwind CSS 3**, **TypeScript**.
-- Backend/Infra: **Prisma**, **MySQL**, **NextAuth**, **Nodemailer**, **Cloudinary**.
+- Backend/Infra: **Prisma**, **PostgreSQL**, **NextAuth**, **Nodemailer**, **Cloudinary**.
 - Calidad: **ESLint**, **PostCSS/Autoprefixer**.
 
 ## ✅ Requisitos
 
 - Node.js 18+ (recomendado 18 LTS o 20 LTS).
-- MySQL (local o gestionado: PlanetScale, Railway, etc.).
+- PostgreSQL (local o gestionado: Supabase, Railway, Neon, etc.).
 - Cuenta de Cloudinary (opcional pero recomendado para imágenes/video).
 - Cuenta Gmail (SMTP) o proveedor SMTP equivalente para el formulario de contacto.
 
@@ -71,8 +71,8 @@ portfolio/
 Crea un fichero `.env.local` en la raíz con las siguientes variables. Explicación incluida:
 
 ```env
-# Base de datos (MySQL)
-DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DB_NAME?connection_limit=5&socket_timeout=300"
+# Base de datos (PostgreSQL)
+PORTFOLIO_DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB_NAME?connection_limit=5&socket_timeout=300"
 
 # NextAuth (credentials)
 NEXTAUTH_URL="http://localhost:3000"            # En prod: https://tu-dominio.com
@@ -94,7 +94,7 @@ NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 
 Notas:
 - Para Gmail se recomienda activar 2FA y usar un **App Password**.
-- Prisma lee `DATABASE_URL`. Cloudinary puede leer `CLOUDINARY_URL` directamente.
+- Prisma lee `PORTFOLIO_DATABASE_URL`. Cloudinary puede leer `CLOUDINARY_URL` directamente.
 
 ## 📜 Scripts Disponibles
 
@@ -187,7 +187,7 @@ npm run dev
 
 Recomendado **Vercel**:
 
-1. Configura variables de entorno en el proyecto de Vercel (`DATABASE_URL`, `NEXTAUTH_*`, `MAIL_*`, `CLOUDINARY_URL`).
+1. Configura variables de entorno en el proyecto de Vercel (`PORTFOLIO_DATABASE_URL`, `NEXTAUTH_*`, `MAIL_*`, `CLOUDINARY_URL`).
 2. Asegura que tu MySQL es accesible desde producción (usa proveedor gestionado).
 3. Ejecuta migraciones en producción (Vercel: Job/CLI o en tu proveedor gestionado).
 
@@ -195,7 +195,7 @@ Alternativas: Netlify/Render/Railway (ajustando adaptadores y build).
 
 ## 🧰 Troubleshooting
 
-- Error Prisma/DB: revisa `DATABASE_URL` y ejecuta `npx prisma migrate deploy` en prod.
+- Error Prisma/DB: revisa `PORTFOLIO_DATABASE_URL` y ejecuta `npx prisma migrate deploy` en prod.
 - Emails no llegan: usa App Password (Gmail) y comprueba `MAIL_USERNAME/MAIL_PASSWORD`.
 - Cloudinary: verifica `CLOUDINARY_URL` y límites de tamaño/formatos.
 - Autenticación: crea un usuario con contraseña hasheada (ver sección correspondiente).

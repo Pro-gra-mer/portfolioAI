@@ -122,17 +122,34 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Si es imagen de proyecto, subir a Cloudinary
-    if (type === 'projectImage') {
-      // Cloudinary lee CLOUDINARY_URL del entorno automáticamente
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+    const shouldUseCloud = isProd || process.env.USE_CLOUDINARY_FOR_ALL === 'true';
+
+    if (type !== 'heroVideo' && shouldUseCloud) {
+      if (!process.env.CLOUDINARY_URL) {
+        return NextResponse.json(
+          { error: 'Cloudinary no está configurado. Verifica CLOUDINARY_URL en las variables de entorno.' },
+          { status: 500 }
+        );
+      }
+
+      const folderByType: Record<string, string> = {
+        projectImage: `portfolio/projects/${userId}`,
+        profileImage: `portfolio/profile/${userId}`,
+        heroImage: `portfolio/hero/${userId}`,
+      };
+      const folder = folderByType[type] ?? `portfolio/misc/${userId}`;
+
       const uploadResult = await new Promise<{ url: string; public_id: string }>((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
-            folder: `portfolio/projects/${userId}`,
+            folder,
             resource_type: 'image',
           },
           (error: any, result: any) => {
-            if (error || !result) return reject(error);
+            if (error || !result) {
+              return reject(error || new Error('Cloudinary no devolvió resultado'));
+            }
             resolve({ url: result.secure_url as string, public_id: result.public_id as string });
           }
         );
@@ -148,7 +165,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Para otros tipos, mantener almacenamiento local actual
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     try { await fs.access(uploadsDir); } catch { await fs.mkdir(uploadsDir, { recursive: true }); }
     const userDir = path.join(uploadsDir, userId);

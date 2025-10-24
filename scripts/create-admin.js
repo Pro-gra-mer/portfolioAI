@@ -1,4 +1,5 @@
 // scripts/create-admin.js
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
