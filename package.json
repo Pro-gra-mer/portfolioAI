@@ -7,7 +7,7 @@
     "seed:services": "node prisma/seed-services.js",
     "seed": "node prisma/seed.js",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/keep-alive.js & next start",
     "lint": "eslint"
   },
   "dependencies": {
