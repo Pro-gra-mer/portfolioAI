@@ -6,7 +6,7 @@
     "dev": "next dev",
     "seed:services": "node prisma/seed-services.js",
     "seed": "node prisma/seed.js",
-    "build": "next build",
+    "build": "npx prisma db push && next build",
     "start": "node scripts/keep-alive.js & next start",
     "lint": "eslint"
   },
