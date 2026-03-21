@@ -639,15 +639,27 @@ Fuera del código, disfruto de la lectura, el deporte y la videografía, activid
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <input
+                          id="about-profile-image-input"
                           type="file"
                           accept="image/*"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) uploadImage(file, 'profileImage');
+                            e.currentTarget.value = '';
                           }}
-                          className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
+                          className="hidden"
                           disabled={imageUploading}
                         />
+                        <label
+                          htmlFor="about-profile-image-input"
+                          className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                            imageUploading
+                              ? 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
+                              : 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30 cursor-pointer'
+                          }`}
+                        >
+                          Seleccionar imagen
+                        </label>
                         {imageUploading && (
                           <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         )}
@@ -714,15 +726,27 @@ Fuera del código, disfruto de la lectura, el deporte y la videografía, activid
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <input
+                          id="about-hero-image-input"
                           type="file"
                           accept="image/*"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) uploadImage(file, 'heroImage');
+                            e.currentTarget.value = '';
                           }}
-                          className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
+                          className="hidden"
                           disabled={imageUploading}
                         />
+                        <label
+                          htmlFor="about-hero-image-input"
+                          className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                            imageUploading
+                              ? 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
+                              : 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30 cursor-pointer'
+                          }`}
+                        >
+                          Seleccionar imagen
+                        </label>
                         {imageUploading && (
                           <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         )}
